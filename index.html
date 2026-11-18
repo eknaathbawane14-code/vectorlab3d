@@ -1,0 +1,4422 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VectorLab — From Words to Vectors | Interactive NLP & Embeddings Visualizer</title>
+  <!-- Google Fonts: Space Grotesk, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Three.js CDN (with built-in interactive 3D fallback engine if offline/blocked) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <style>
+    :root {
+      /* Default 3D Theme: Holographic Emerald & Cyber Gold 3D */
+      --bg-deep: #03070b;
+      --bg-navy: #07121a;
+      --bg-card: rgba(9, 22, 34, 0.78);
+      --bg-card-hover: rgba(13, 31, 48, 0.9);
+      --bg-glass: rgba(8, 20, 32, 0.74);
+      --border-subtle: rgba(45, 212, 191, 0.18);
+      --border-purple: rgba(0, 245, 212, 0.5);
+      --border-cyan: rgba(251, 191, 36, 0.5);
+      --purple-primary: #00d2b4;
+      --purple-bright: #00f5d4;
+      --purple-glow: rgba(0, 245, 212, 0.32);
+      --cyan-primary: #f59e0b;
+      --cyan-bright: #fbbf24;
+      --cyan-glow: rgba(251, 191, 36, 0.28);
+      --emerald: #10b981;
+      --amber: #fb923c;
+      --rose: #f43f5e;
+      --blue: #38bdf8;
+      --text-main: #f0fdfa;
+      --text-secondary: #ccfbf1;
+      --text-muted: #99f6e4;
+      --text-dim: #5eead4;
+      --sidebar-width: 280px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --extrude-dark: #02080d;
+      --extrude-edge: rgba(0, 245, 212, 0.25);
+      --shadow-card:
+        0 10px 0 -2px rgba(2, 8, 14, 0.95),
+        0 11px 0 -1px rgba(0, 245, 212, 0.28),
+        0 24px 48px -8px rgba(0, 0, 0, 0.85),
+        inset 0 1px 1px rgba(255, 255, 255, 0.22);
+      --transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* 3D Theme Preset 2: Solaris Cyber-Magenta & Neon Cyan 3D */
+    html[data-theme="solaris"] {
+      --bg-deep: #09040e;
+      --bg-navy: #140821;
+      --bg-card: rgba(26, 11, 41, 0.78);
+      --bg-card-hover: rgba(38, 16, 59, 0.9);
+      --bg-glass: rgba(22, 9, 36, 0.74);
+      --border-subtle: rgba(244, 63, 94, 0.22);
+      --border-purple: rgba(255, 42, 133, 0.55);
+      --border-cyan: rgba(56, 189, 248, 0.55);
+      --purple-primary: #e11d48;
+      --purple-bright: #ff2a85;
+      --purple-glow: rgba(255, 42, 133, 0.32);
+      --cyan-primary: #0284c7;
+      --cyan-bright: #38bdf8;
+      --cyan-glow: rgba(56, 189, 248, 0.3);
+      --text-main: #fff1f2;
+      --text-secondary: #ffe4e6;
+      --text-muted: #fda4af;
+      --text-dim: #fb7185;
+      --extrude-edge: rgba(255, 42, 133, 0.32);
+      --shadow-card:
+        0 10px 0 -2px rgba(8, 2, 14, 0.95),
+        0 11px 0 -1px rgba(255, 42, 133, 0.32),
+        0 24px 48px -8px rgba(0, 0, 0, 0.85),
+        inset 0 1px 1px rgba(255, 255, 255, 0.22);
+    }
+
+    /* 3D Theme Preset 3: Quantum Cobalt & Electric Violet 3D */
+    html[data-theme="quantum"] {
+      --bg-deep: #040611;
+      --bg-navy: #0a1029;
+      --bg-card: rgba(13, 21, 52, 0.78);
+      --bg-card-hover: rgba(19, 30, 72, 0.9);
+      --bg-glass: rgba(12, 18, 44, 0.74);
+      --border-subtle: rgba(99, 102, 241, 0.22);
+      --border-purple: rgba(129, 140, 248, 0.55);
+      --border-cyan: rgba(34, 211, 238, 0.55);
+      --purple-primary: #6366f1;
+      --purple-bright: #818cf8;
+      --purple-glow: rgba(99, 102, 241, 0.32);
+      --cyan-primary: #06b6d4;
+      --cyan-bright: #22d3ee;
+      --cyan-glow: rgba(34, 211, 238, 0.3);
+      --text-main: #f8fafc;
+      --text-secondary: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --extrude-edge: rgba(129, 140, 248, 0.32);
+      --shadow-card:
+        0 10px 0 -2px rgba(3, 5, 15, 0.95),
+        0 11px 0 -1px rgba(129, 140, 248, 0.32),
+        0 24px 48px -8px rgba(0, 0, 0, 0.85),
+        inset 0 1px 1px rgba(255, 255, 255, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      background-image:
+        radial-gradient(circle at 18% 12%, var(--purple-glow) 0%, transparent 40%),
+        radial-gradient(circle at 85% 28%, var(--cyan-glow) 0%, transparent 42%),
+        radial-gradient(circle at 50% 80%, var(--purple-glow) 0%, transparent 48%),
+        linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-navy) 50%, var(--bg-deep) 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text-main);
+      perspective: 1400px;
+    }
+
+    /* 3D Perspective Floor Horizon Grid */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, var(--border-subtle) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--border-subtle) 1px, transparent 1px);
+      background-size: 48px 48px;
+      transform: perspective(700px) rotateX(28deg) scale(1.25);
+      transform-origin: center top;
+      opacity: 0.28;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ambient 3D Background Canvas */
+    #ambient-3d-bg {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.65;
+    }
+
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.02em;
+      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.65);
+    }
+
+    code, pre, .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Layout Structure */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 3D Floating Sidebar Navigation */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(165deg, rgba(8, 20, 32, 0.92), rgba(3, 8, 15, 0.95));
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-right: 1px solid var(--border-purple);
+      box-shadow:
+        6px 0 0 rgba(0, 0, 0, 0.7),
+        7px 0 24px rgba(0, 0, 0, 0.75),
+        inset -1px 0 0 rgba(255, 255, 255, 0.12);
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 16px;
+      transition: transform 0.3s ease;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px 16px 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 14px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--purple-bright), var(--cyan-bright));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 4px 0 rgba(0, 0, 0, 0.7),
+        0 0 24px var(--purple-glow),
+        inset 0 2px 2px rgba(255, 255, 255, 0.45);
+      transform: rotateX(10deg) rotateY(-12deg);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 0.7rem;
+      color: var(--cyan-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+
+    /* 3D Theme Switcher Widget in Sidebar */
+    .theme-3d-switcher {
+      background: rgba(2, 8, 15, 0.72);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 14px;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.65);
+    }
+
+    .theme-3d-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .theme-3d-btn {
+      padding: 6px 4px;
+      border-radius: 8px;
+      font-size: 0.69rem;
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+      background: rgba(15, 28, 44, 0.8);
+      color: var(--text-secondary);
+      cursor: pointer;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.75);
+      transition: var(--transition);
+    }
+
+    .theme-3d-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .theme-3d-btn.active {
+      background: linear-gradient(135deg, var(--purple-primary), var(--cyan-primary));
+      color: #02080d;
+      font-weight: 700;
+      border-color: #ffffff;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.85), 0 0 12px var(--purple-glow);
+    }
+
+    .nav-section-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      padding: 0 10px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+      overflow-y: auto;
+      padding: 2px 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: 11px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 500;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(10, 22, 36, 0.55);
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.65);
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: var(--text-main);
+      transform: translateY(-2px) translateZ(6px);
+      border-color: var(--border-purple);
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.75), 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-link.active {
+      color: var(--text-main);
+      background: linear-gradient(95deg, rgba(0, 245, 212, 0.22), rgba(251, 191, 36, 0.12));
+      border-color: var(--purple-bright);
+      transform: translateY(-2px);
+      box-shadow:
+        0 5px 0 rgba(0, 0, 0, 0.85),
+        0 0 20px var(--purple-glow),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    }
+
+    .nav-link.active::before {
+      content: "";
+      position: absolute;
+      left: -1px;
+      top: 18%;
+      bottom: 18%;
+      width: 4px;
+      background: linear-gradient(180deg, var(--purple-bright), var(--cyan-bright));
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--purple-bright);
+    }
+
+    .nav-step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      background: rgba(2, 8, 15, 0.75);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .nav-link.active .nav-step-num {
+      background: linear-gradient(135deg, var(--purple-bright), var(--cyan-bright));
+      color: #02080d;
+      border-color: #fff;
+      box-shadow: 0 0 12px var(--purple-glow);
+    }
+
+    .nav-link.visited .nav-step-check {
+      opacity: 1;
+      color: var(--cyan-bright);
+    }
+
+    .nav-step-check {
+      margin-left: auto;
+      font-size: 0.75rem;
+      opacity: 0.2;
+      transition: var(--transition);
+    }
+
+    /* 3D Progress Box in Sidebar */
+    .progress-widget {
+      margin-top: 12px;
+      padding: 13px;
+      border-radius: var(--radius-md);
+      background: rgba(4, 12, 22, 0.85);
+      border: 1px solid var(--border-purple);
+      box-shadow:
+        0 6px 0 rgba(0, 0, 0, 0.8),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      margin-bottom: 8px;
+    }
+
+    .progress-title {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .progress-pct {
+      color: var(--cyan-bright);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      height: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 14%;
+      background: linear-gradient(90deg, var(--purple-bright), var(--cyan-bright));
+      border-radius: 999px;
+      box-shadow: 0 0 10px var(--purple-bright);
+      transition: width 0.4s ease;
+    }
+
+    .progress-sub {
+      font-size: 0.71rem;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Mobile Header */
+    .mobile-header {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 95;
+      background: rgba(4, 10, 18, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-purple);
+      padding: 12px 18px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .menu-toggle-btn {
+      background: rgba(0, 245, 212, 0.15);
+      border: 1px solid var(--border-purple);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.8);
+    }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 98;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      max-width: calc(100vw - var(--sidebar-width));
+      padding: 0 40px 90px 40px;
+      transform-style: preserve-3d;
+    }
+
+    .section-block {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 64px;
+      padding-bottom: 44px;
+      border-bottom: 1px solid var(--border-subtle);
+      transform-style: preserve-3d;
+    }
+
+    /* 3D Extruded Badges & Section Headers */
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(0, 245, 212, 0.16), rgba(251, 191, 36, 0.1));
+      border: 1px solid var(--border-purple);
+      color: var(--purple-bright);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+      box-shadow:
+        0 4px 0 rgba(0, 0, 0, 0.75),
+        0 0 18px var(--purple-glow),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    }
+
+    .section-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan-bright);
+      box-shadow: 0 0 10px var(--cyan-bright);
+    }
+
+    .section-title {
+      font-size: clamp(1.9rem, 3.2vw, 2.65rem);
+      font-weight: 700;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--purple-bright) 55%, var(--cyan-bright) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.65));
+    }
+
+    .section-lead {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 780px;
+      margin-bottom: 28px;
+    }
+
+    /* 3D Extruded Interactive Cards with Tilt Support */
+    .glass-card {
+      background:
+        radial-gradient(500px circle at var(--glare-x, 20%) var(--glare-y, 15%), rgba(255, 255, 255, 0.07), transparent 45%),
+        var(--bg-card);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border-subtle);
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      box-shadow: var(--shadow-card);
+      transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
+      transform-style: preserve-3d;
+      transition: transform 0.18s ease-out, border-color 0.25s ease, box-shadow 0.25s ease;
+      position: relative;
+    }
+
+    .glass-card:hover {
+      border-color: var(--border-purple);
+      box-shadow:
+        0 12px 0 -2px rgba(2, 8, 14, 0.96),
+        0 13px 0 -1px var(--purple-bright),
+        0 28px 56px -8px rgba(0, 0, 0, 0.9),
+        0 0 28px var(--purple-glow),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+
+    .glass-card.accent-purple {
+      border-color: var(--border-purple);
+    }
+
+    .glass-card.accent-cyan {
+      border-color: var(--border-cyan);
+    }
+
+    /* Educational Notice Banner (3D Beveled Strip) */
+    .edu-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 15px 18px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(90deg, rgba(0, 245, 212, 0.12), rgba(251, 191, 36, 0.08));
+      border: 1px solid var(--border-cyan);
+      color: var(--text-secondary);
+      font-size: 0.86rem;
+      margin-bottom: 24px;
+      box-shadow:
+        0 6px 0 rgba(2, 8, 14, 0.9),
+        0 12px 24px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .edu-notice strong {
+      color: var(--cyan-bright);
+    }
+
+    /* Grid utilities */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    /* 3D Hero Section */
+    .hero-section {
+      padding-top: 42px;
+      padding-bottom: 48px;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      padding: 46px 40px;
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 85% 20%, var(--purple-glow), transparent 45%),
+        radial-gradient(circle at 15% 85%, var(--cyan-glow), transparent 45%),
+        linear-gradient(155deg, rgba(10, 25, 40, 0.9), rgba(4, 10, 18, 0.94));
+      border: 1px solid var(--border-purple);
+      border-top: 1px solid rgba(255, 255, 255, 0.32);
+      box-shadow:
+        0 14px 0 -2px rgba(2, 7, 13, 0.98),
+        0 16px 0 -1px var(--purple-bright),
+        0 32px 64px rgba(0, 0, 0, 0.88),
+        0 0 48px var(--purple-glow),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+      transform-style: preserve-3d;
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 4.6vw, 3.85rem);
+      font-weight: 700;
+      line-height: 1.08;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 10%, var(--purple-bright) 55%, var(--cyan-bright) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.75));
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 720px;
+      margin-bottom: 32px;
+    }
+
+    /* 3D Isometric Animated Pipeline Visualization in Hero */
+    .hero-pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      margin: 32px 0;
+      position: relative;
+      transform: perspective(1000px) rotateX(6deg);
+      transform-style: preserve-3d;
+    }
+
+    .pipeline-stage {
+      background: linear-gradient(180deg, rgba(14, 32, 48, 0.92), rgba(5, 13, 22, 0.95));
+      border: 1px solid var(--border-subtle);
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: var(--radius-md);
+      padding: 16px 14px;
+      position: relative;
+      transition: var(--transition);
+      cursor: pointer;
+      box-shadow:
+        0 8px 0 rgba(1, 5, 10, 0.95),
+        0 14px 24px rgba(0, 0, 0, 0.65);
+    }
+
+    .pipeline-stage:hover {
+      transform: translateY(-5px) translateZ(12px);
+    }
+
+    .pipeline-stage.active-stage {
+      border-color: var(--cyan-bright);
+      background: linear-gradient(180deg, rgba(0, 245, 212, 0.22), rgba(251, 191, 36, 0.14));
+      box-shadow:
+        0 11px 0 rgba(1, 5, 10, 0.96),
+        0 12px 0 var(--cyan-bright),
+        0 20px 32px rgba(0, 0, 0, 0.8),
+        0 0 28px var(--cyan-glow);
+      transform: translateY(-7px) translateZ(18px);
+    }
+
+    .pipeline-stage-step {
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--cyan-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+    }
+
+    .pipeline-stage-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .pipeline-stage-demo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #ffffff;
+      background: rgba(2, 6, 12, 0.82);
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.75);
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+    }
+
+    /* 3D Tactile Push-Buttons */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 26px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--purple-bright), var(--cyan-bright));
+      color: #02080d;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.96rem;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow:
+        0 6px 0 #022c22,
+        0 12px 24px var(--purple-glow),
+        inset 0 1px 1px rgba(255, 255, 255, 0.65);
+      transform: translateY(-2px);
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 8px 0 #022c22,
+        0 16px 32px var(--purple-glow),
+        inset 0 1px 2px rgba(255, 255, 255, 0.8);
+    }
+
+    .btn-primary:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #022c22, 0 4px 10px var(--purple-glow);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(16, 36, 54, 0.92), rgba(8, 19, 31, 0.95));
+      color: var(--text-main);
+      font-size: 0.86rem;
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.2s ease;
+      text-decoration: none;
+      box-shadow: 0 5px 0 rgba(1, 5, 10, 0.95), 0 8px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--cyan-bright);
+      color: var(--cyan-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 7px 0 rgba(1, 5, 10, 0.95), 0 0 16px var(--cyan-glow);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 rgba(1, 5, 10, 0.95);
+    }
+
+    .btn-chip {
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: linear-gradient(180deg, rgba(16, 35, 52, 0.88), rgba(7, 17, 28, 0.92));
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(1, 5, 10, 0.9);
+      transition: var(--transition);
+    }
+
+    .btn-chip:hover, .btn-chip.active {
+      background: linear-gradient(135deg, rgba(0, 245, 212, 0.25), rgba(251, 191, 36, 0.2));
+      border-color: var(--purple-bright);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 rgba(1, 5, 10, 0.95), 0 0 14px var(--purple-glow);
+    }
+
+    /* 3D Extruded Stat Cards */
+    .stat-card {
+      background: linear-gradient(165deg, rgba(12, 28, 44, 0.88), rgba(5, 13, 22, 0.92));
+      border: 1px solid var(--border-subtle);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      box-shadow:
+        0 7px 0 rgba(1, 5, 10, 0.95),
+        0 14px 28px rgba(0, 0, 0, 0.6);
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px) translateZ(8px);
+      border-color: var(--border-purple);
+    }
+
+    .stat-label {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.48rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .stat-desc {
+      font-size: 0.76rem;
+      color: var(--cyan-bright);
+      margin-top: 2px;
+    }
+
+    /* Inputs & Controls (Recessed 3D Wells) */
+    .input-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .text-input, .select-input {
+      background: rgba(2, 7, 14, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 11px;
+      padding: 12px 16px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      box-shadow:
+        inset 0 3px 8px rgba(0, 0, 0, 0.85),
+        0 1px 0 rgba(255, 255, 255, 0.12);
+      transition: var(--transition);
+    }
+
+    .text-input:focus, .select-input:focus {
+      border-color: var(--purple-bright);
+      box-shadow:
+        inset 0 3px 8px rgba(0, 0, 0, 0.85),
+        0 0 0 3px var(--purple-glow);
+    }
+
+    .text-input.flex-grow {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    /* 3D Mode Selector Tabs */
+    .mode-tabs {
+      display: inline-flex;
+      background: rgba(2, 7, 14, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 5px;
+      gap: 6px;
+      flex-wrap: wrap;
+      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    .mode-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .mode-tab.active {
+      background: linear-gradient(135deg, var(--purple-bright), var(--cyan-bright));
+      color: #02080d;
+      border-color: #ffffff;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.8), 0 0 14px var(--purple-glow);
+      transform: translateY(-1px);
+    }
+
+    /* 3D Tactile Colored Token Cubes */
+    .token-stream {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 20px;
+      background: rgba(2, 6, 12, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      min-height: 82px;
+      align-items: center;
+      box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.85);
+    }
+
+    .token-pill {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 9px 14px;
+      border-radius: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: var(--transition);
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-top: 1px solid rgba(255, 255, 255, 0.35);
+      user-select: none;
+      transform: translateY(-2px);
+    }
+
+    .token-pill:hover {
+      transform: translateY(-6px) scale(1.04);
+    }
+
+    .token-pill:active {
+      transform: translateY(1px);
+    }
+
+    .token-pill .tok-str {
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    .token-pill .tok-meta {
+      font-size: 0.68rem;
+      opacity: 0.88;
+      margin-top: 3px;
+    }
+
+    /* 3D Extruded Token Type Colors */
+    .tok-type-word {
+      background: linear-gradient(180deg, rgba(0, 245, 212, 0.26), rgba(0, 150, 136, 0.22));
+      border-color: rgba(0, 245, 212, 0.65);
+      color: #ccfbf1;
+      box-shadow: 0 5px 0 #042f2e, 0 8px 16px rgba(0, 245, 212, 0.18);
+    }
+    .tok-type-subword-root {
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.26), rgba(2, 132, 199, 0.22));
+      border-color: rgba(56, 189, 248, 0.65);
+      color: #e0f2fe;
+      box-shadow: 0 5px 0 #082f49, 0 8px 16px rgba(56, 189, 248, 0.18);
+    }
+    .tok-type-subword-affix {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.28), rgba(5, 150, 105, 0.22));
+      border-color: rgba(16, 185, 129, 0.65);
+      color: #d1fae5;
+      box-shadow: 0 5px 0 #064e3b, 0 8px 16px rgba(16, 185, 129, 0.18);
+    }
+    .tok-type-punctuation {
+      background: linear-gradient(180deg, rgba(251, 191, 36, 0.28), rgba(217, 119, 6, 0.22));
+      border-color: rgba(251, 191, 36, 0.65);
+      color: #fef3c7;
+      box-shadow: 0 5px 0 #451a03, 0 8px 16px rgba(251, 191, 36, 0.18);
+    }
+    .tok-type-number {
+      background: linear-gradient(180deg, rgba(244, 63, 94, 0.28), rgba(190, 18, 60, 0.22));
+      border-color: rgba(244, 63, 94, 0.65);
+      color: #ffe4e6;
+      box-shadow: 0 5px 0 #4c0519, 0 8px 16px rgba(244, 63, 94, 0.18);
+    }
+    .tok-type-char {
+      background: linear-gradient(180deg, rgba(168, 85, 247, 0.28), rgba(126, 34, 206, 0.22));
+      border-color: rgba(168, 85, 247, 0.65);
+      color: #f3e8ff;
+      box-shadow: 0 5px 0 #3b0764, 0 8px 16px rgba(168, 85, 247, 0.18);
+    }
+
+    /* Tables */
+    .table-container {
+      max-height: 430px;
+      overflow-y: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: rgba(3, 9, 16, 0.85);
+      box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.8);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    .data-table th {
+      position: sticky;
+      top: 0;
+      background: #071521;
+      color: var(--purple-bright);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.73rem;
+      letter-spacing: 0.07em;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border-purple);
+      z-index: 2;
+    }
+
+    .data-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+      color: var(--text-secondary);
+    }
+
+    .data-table tr {
+      transition: background 0.15s ease;
+      cursor: pointer;
+    }
+
+    .data-table tbody tr:hover {
+      background: rgba(0, 245, 212, 0.11);
+    }
+
+    .data-table tbody tr.selected-row {
+      background: rgba(251, 191, 36, 0.18);
+      border-left: 4px solid var(--cyan-bright);
+    }
+
+    /* Connected 3D Visual Mapping ("I love AI") */
+    .mapping-diagram {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .mapping-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(11, 26, 40, 0.9), rgba(4, 11, 19, 0.95));
+      border: 1px solid var(--border-subtle);
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      position: relative;
+      box-shadow: 0 8px 0 rgba(1, 5, 10, 0.95), 0 14px 24px rgba(0, 0, 0, 0.65);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .mapping-column:hover {
+      transform: translateY(-4px);
+      border-color: var(--purple-bright);
+    }
+
+    .mapping-node {
+      padding: 9px 16px;
+      border-radius: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.7);
+    }
+
+    .mapping-arrow {
+      color: var(--cyan-bright);
+      font-size: 1.1rem;
+      margin: 8px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    /* 3D Extruded Word Grid in Embeddings Section */
+    .word-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .word-card-btn {
+      padding: 12px 10px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(14, 31, 48, 0.9), rgba(6, 15, 25, 0.95));
+      border: 1px solid var(--border-subtle);
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 6px 0 rgba(1, 5, 10, 0.95), 0 10px 18px rgba(0, 0, 0, 0.55);
+    }
+
+    .word-card-btn:hover {
+      border-color: var(--purple-bright);
+      transform: translateY(-4px);
+      box-shadow: 0 9px 0 rgba(1, 5, 10, 0.95), 0 0 18px var(--purple-glow);
+    }
+
+    .word-card-btn.active {
+      background: linear-gradient(135deg, rgba(0, 245, 212, 0.28), rgba(251, 191, 36, 0.22));
+      border-color: var(--cyan-bright);
+      transform: translateY(-4px);
+      box-shadow:
+        0 8px 0 rgba(1, 5, 10, 0.95),
+        0 9px 0 var(--cyan-bright),
+        0 0 22px var(--cyan-glow);
+    }
+
+    .word-card-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
+
+    .word-card-cat {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    /* Vector Dimension Bars */
+    .dim-bar-row {
+      display: grid;
+      grid-template-columns: 145px 1fr 60px;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 0.82rem;
+    }
+
+    .dim-bar-track {
+      height: 11px;
+      background: rgba(1, 5, 10, 0.8);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .dim-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--purple-bright), var(--cyan-bright));
+      box-shadow: 0 0 10px var(--purple-glow);
+      transition: width 0.35s ease;
+    }
+
+    /* 3D Embedding Space Container */
+    .space-3d-layout {
+      display: grid;
+      grid-template-columns: 1fr 345px;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .canvas-3d-wrapper {
+      position: relative;
+      height: 590px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(0, 245, 212, 0.14) 0%, rgba(7, 18, 28, 0.95) 55%, #02060b 100%);
+      border: 2px solid var(--border-purple);
+      box-shadow:
+        0 12px 0 rgba(1, 5, 10, 0.96),
+        0 14px 0 var(--purple-bright),
+        0 28px 60px rgba(0, 0, 0, 0.9),
+        inset 0 0 60px rgba(0, 0, 0, 0.85);
+    }
+
+    #embedding-3d-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+
+    #embedding-3d-canvas:active {
+      cursor: grabbing;
+    }
+
+    .canvas-overlay-top {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      gap: 10px;
+      flex-wrap: wrap;
+      z-index: 10;
+    }
+
+    .canvas-overlay-top > * {
+      pointer-events: auto;
+    }
+
+    .canvas-overlay-bottom {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      flex-wrap: wrap;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .canvas-overlay-bottom > * {
+      pointer-events: auto;
+    }
+
+    .legend-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(3, 10, 18, 0.88);
+      backdrop-filter: blur(12px);
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-purple);
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.8);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px 9px;
+      border-radius: 7px;
+      border: 1px solid transparent;
+      user-select: none;
+      transition: var(--transition);
+    }
+
+    .legend-item.inactive {
+      opacity: 0.35;
+      text-decoration: line-through;
+    }
+
+    .legend-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .tooltip-3d {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(3, 9, 16, 0.96);
+      border: 1px solid var(--cyan-bright);
+      padding: 9px 13px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      color: #fff;
+      z-index: 30;
+      display: none;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.9), 0 12px 24px rgba(0, 0, 0, 0.8);
+      white-space: nowrap;
+    }
+
+    /* Progress Bar for Similarity */
+    .sim-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sim-bar-bg {
+      flex: 1;
+      height: 9px;
+      background: rgba(1, 5, 10, 0.85);
+      border-radius: 999px;
+      overflow: hidden;
+      min-width: 70px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .sim-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple-bright), var(--cyan-bright));
+      border-radius: 999px;
+      box-shadow: 0 0 8px var(--purple-glow);
+    }
+
+    /* 3D Formula Display */
+    .formula-box {
+      background: linear-gradient(180deg, rgba(2, 8, 15, 0.95), rgba(7, 20, 32, 0.95));
+      border: 1px solid var(--border-purple);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--cyan-bright);
+      margin: 16px 0;
+      box-shadow:
+        0 6px 0 rgba(1, 5, 10, 0.95),
+        inset 0 0 28px var(--purple-glow);
+    }
+
+    /* 3D Experiment Pipeline Steps */
+    .exp-step-card {
+      background: linear-gradient(165deg, rgba(9, 22, 35, 0.9), rgba(4, 10, 18, 0.95));
+      border: 1px solid var(--border-subtle);
+      border-left: 4px solid var(--purple-bright);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow:
+        0 7px 0 rgba(1, 5, 10, 0.95),
+        0 14px 28px rgba(0, 0, 0, 0.65);
+    }
+
+    .exp-step-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .exp-step-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--cyan-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1080px) {
+      .space-3d-layout {
+        grid-template-columns: 1fr;
+      }
+      .hero-pipeline {
+        grid-template-columns: repeat(2, 1fr);
+        transform: none;
+      }
+      .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 860px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .sidebar-backdrop.open {
+        display: block;
+      }
+      .mobile-header {
+        display: flex;
+      }
+      .main-content {
+        margin-left: 0;
+        max-width: 100vw;
+        padding: 0 18px 60px 18px;
+      }
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .mapping-diagram {
+        grid-template-columns: 1fr;
+      }
+      .hero-card {
+        padding: 28px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="ambient-3d-bg" aria-hidden="true"></canvas>
+
+  <!-- Mobile Top Header -->
+  <header class="mobile-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="brand-icon" style="width:30px;height:30px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#02080d" stroke-width="2.4">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+      </div>
+      <span class="brand-title">VectorLab 3D</span>
+    </div>
+    <button class="menu-toggle-btn" id="mobile-menu-btn" aria-label="Toggle Navigation">☰ Menu</button>
+  </header>
+
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <div class="app-shell">
+    <!-- Sticky/Fixed Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-box">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#02080d" stroke-width="2.4">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">VectorLab 3D</div>
+          <div class="brand-sub">Spatial NLP Lab</div>
+        </div>
+      </div>
+
+      <!-- 3D Theme & Tilt Physics Switcher -->
+      <div class="theme-3d-switcher">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">3D Spatial Theme</span>
+          <button type="button" id="toggle-3d-tilt-btn" style="background:none;border:none;color:var(--cyan-bright);font-size:0.68rem;font-weight:700;cursor:pointer;">3D Tilt: ON</button>
+        </div>
+        <div class="theme-3d-grid" id="theme-3d-grid">
+          <button type="button" class="theme-3d-btn active" data-theme-val="emerald">Emerald 3D</button>
+          <button type="button" class="theme-3d-btn" data-theme-val="solaris">Solaris 3D</button>
+          <button type="button" class="theme-3d-btn" data-theme-val="quantum">Quantum 3D</button>
+        </div>
+      </div>
+
+      <div class="nav-section-label">Learning Pipeline</div>
+      <ul class="nav-list" id="nav-list">
+        <li>
+          <a href="#home" class="nav-link active visited" data-section="home">
+            <span class="nav-step-num">01</span>
+            <span>Home</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </li>
+        <li>
+          <a href="#tokenization" class="nav-link" data-section="tokenization">
+            <span class="nav-step-num">02</span>
+            <span>Tokenization</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </li>
+        <li>
+          <a href="#vocabulary" class="nav-link" data-section="vocabulary">
+            <span class="nav-step-num">03</span>
+            <span>Vocabulary</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </li>
+        <li>
+          <a href="#embeddings" class="nav-link" data-section="embeddings">
+            <span class="nav-step-num">04</span>
+            <span>Embeddings</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </li>
+        <li>
+          <a href="#space-3d" class="nav-link" data-section="space-3d">
+            <span class="nav-step-num">05</span>
+            <span>3D Embedding Space</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </li>
+        <li>
+          <a href="#closest-pairs" class="nav-link" data-section="closest-pairs">
+            <span class="nav-step-num">06</span>
+            <span>Closest Pairs</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </li>
+        <li>
+          <a href="#experiment" class="nav-link" data-section="experiment">
+            <span class="nav-step-num">07</span>
+            <span>Try Your Own Text</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="progress-widget">
+        <div class="progress-header">
+          <span class="progress-title">Learning Journey</span>
+          <span class="progress-pct" id="journey-pct">14%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="journey-bar"></div>
+        </div>
+        <div class="progress-sub">
+          <span id="journey-count">1 of 7 modules explored</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- ==========================================
+           SECTION 1: LANDING PAGE (HOME)
+      =========================================== -->
+      <section id="home" class="section-block hero-section">
+        <div class="hero-card">
+          <div class="section-badge">
+            <span class="dot"></span>
+            <span>Interactive AI Research Laboratory</span>
+          </div>
+          <h1 class="hero-title">From Words to Vectors</h1>
+          <p class="hero-subtitle">
+            Explore how machines understand language through tokenization, vocabulary, embeddings, and vector similarity.
+          </p>
+
+          <!-- Animated Interactive Pipeline: TEXT -> TOKENS -> NUMBERS -> VECTORS -> MEANING -->
+          <div class="hero-pipeline" id="hero-pipeline">
+            <div class="pipeline-stage active-stage" data-stage="0">
+              <div class="pipeline-stage-step"><span>STAGE 01</span><span>→</span></div>
+              <div class="pipeline-stage-name">TEXT</div>
+              <div class="pipeline-stage-demo" id="hero-demo-0">"I love AI"</div>
+            </div>
+            <div class="pipeline-stage" data-stage="1">
+              <div class="pipeline-stage-step"><span>STAGE 02</span><span>→</span></div>
+              <div class="pipeline-stage-name">TOKENS</div>
+              <div class="pipeline-stage-demo" id="hero-demo-1">["I", "love", "AI"]</div>
+            </div>
+            <div class="pipeline-stage" data-stage="2">
+              <div class="pipeline-stage-step"><span>STAGE 03</span><span>→</span></div>
+              <div class="pipeline-stage-name">NUMBERS</div>
+              <div class="pipeline-stage-demo" id="hero-demo-2">[1, 24, 37]</div>
+            </div>
+            <div class="pipeline-stage" data-stage="3">
+              <div class="pipeline-stage-step"><span>STAGE 04</span><span>→</span></div>
+              <div class="pipeline-stage-name">VECTORS</div>
+              <div class="pipeline-stage-demo" id="hero-demo-3">[0.92, 0.85, 0.14...]</div>
+            </div>
+            <div class="pipeline-stage" data-stage="4">
+              <div class="pipeline-stage-step"><span>STAGE 05</span><span>★</span></div>
+              <div class="pipeline-stage-name">MEANING</div>
+              <div class="pipeline-stage-demo" id="hero-demo-4">cos(AI, Robot) = 0.96</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:26px;">
+            <div style="display:flex;gap:14px;flex-wrap:wrap;">
+              <a href="#tokenization" class="btn-primary" id="explore-process-btn">
+                <span>Explore the Process</span>
+                <span>→</span>
+              </a>
+              <a href="#space-3d" class="btn-secondary">
+                <span>Jump to 3D Embedding Space</span>
+              </a>
+            </div>
+            <div style="font-size:0.82rem;color:var(--text-muted);" id="hero-stage-caption">
+              Click any stage above or watch the live transformation pipeline cycle automatically.
+            </div>
+          </div>
+
+          <!-- Small Statistics Cards -->
+          <div class="grid-4" style="margin-top:34px;">
+            <div class="stat-card">
+              <div class="stat-label">Tokenization</div>
+              <div class="stat-value">3 Modes</div>
+              <div class="stat-desc">Word, Subword (BPE-style) & Character</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Vocabulary</div>
+              <div class="stat-value" id="hero-stat-vocab">56 Tokens</div>
+              <div class="stat-desc">Dynamic ID lookup table</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Vector Dimensions</div>
+              <div class="stat-value">8D → 3D / 2D</div>
+              <div class="stat-desc">Multi-dimensional semantic axes</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Similarity Score</div>
+              <div class="stat-value">Cosine θ</div>
+              <div class="stat-desc">Real-time dot-product geometry</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECTION 2: TOKENIZATION
+      =========================================== -->
+      <section id="tokenization" class="section-block">
+        <div class="section-badge">
+          <span class="dot"></span>
+          <span>Step 01 • Breaking Down Language</span>
+        </div>
+        <h2 class="section-title">Tokenization</h2>
+        <p class="section-lead">
+          Computers cannot read raw paragraphs directly. The very first step in Natural Language Processing (NLP) is <strong>tokenization</strong>: splitting raw text into smaller, discrete building blocks called <em>tokens</em>.
+        </p>
+
+        <!-- Educational Explanation Cards -->
+        <div class="grid-2" style="margin-bottom:24px;">
+          <div class="glass-card">
+            <h3 style="font-size:1.1rem;margin-bottom:8px;color:var(--cyan-bright);">Why Divide Text into Tokens?</h3>
+            <p style="font-size:0.9rem;color:var(--text-secondary);">
+              Neural networks only process numbers. By breaking sentences into standardized pieces—words, subwords, or characters—a model can look up each piece in a finite dictionary and convert text into a sequence of integers.
+            </p>
+          </div>
+          <div class="glass-card">
+            <h3 style="font-size:1.1rem;margin-bottom:8px;color:var(--purple-bright);">Comparing Tokenization Granularity</h3>
+            <ul style="font-size:0.88rem;color:var(--text-secondary);padding-left:18px;display:flex;flex-direction:column;gap:4px;">
+              <li><strong>Word-level:</strong> Splits on spaces & punctuation. Simple, but struggles with unknown or misspelled words.</li>
+              <li><strong>Subword-level:</strong> Keeps common words intact and splits complex words into roots + suffixes (e.g., <code>change</code> + <code>##ing</code>).</li>
+              <li><strong>Character-level:</strong> Splits text into individual letters. Smallest vocabulary, but sequences become very long.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="edu-notice">
+          <span>ℹ️</span>
+          <div>
+            <strong>Educational Approximation Notice:</strong> The tokenizer below is an interactive educational approximation designed to clearly illustrate Word-level, Character-level, and rule-based Subword (BPE-style) splitting. Production LLMs (like GPT-4 or Gemini) train statistical Byte-Pair Encoding or SentencePiece tokenizers on terabytes of text.
+          </div>
+        </div>
+
+        <!-- Interactive Tokenization Playground -->
+        <div class="glass-card accent-purple">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
+            <div>
+              <h3 style="font-size:1.2rem;">Interactive Tokenization Playground</h3>
+              <p style="font-size:0.84rem;color:var(--text-muted);">Type any sentence or choose a preset, then switch modes to inspect how tokens and IDs change.</p>
+            </div>
+            <div class="mode-tabs" id="tokenizer-mode-tabs" role="tablist">
+              <button class="mode-tab active" data-mode="word" type="button">Word-level</button>
+              <button class="mode-tab" data-mode="subword" type="button">Subword-level (BPE-style)</button>
+              <button class="mode-tab" data-mode="char" type="button">Character-level</button>
+            </div>
+          </div>
+
+          <!-- Input Row -->
+          <div class="input-group">
+            <input
+              type="text"
+              id="tokenizer-input"
+              class="text-input flex-grow"
+              value="Artificial intelligence is changing the world."
+              placeholder="Enter any sentence to tokenize..."
+              aria-label="Sentence to tokenize"
+            />
+            <button class="btn-primary" id="tokenize-btn" type="button">Tokenize</button>
+          </div>
+
+          <!-- Preset Example Chips -->
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+            <span style="font-size:0.78rem;color:var(--text-dim);">Try sample:</span>
+            <button class="btn-chip tok-sample" data-text="Artificial intelligence is changing the world." type="button">Artificial intelligence...</button>
+            <button class="btn-chip tok-sample" data-text="I love AI and machine learning!" type="button">I love AI...</button>
+            <button class="btn-chip tok-sample" data-text="The king and queen rode in a fast car." type="button">The king and queen...</button>
+            <button class="btn-chip tok-sample" data-text="Unbelievable tokenization experiments in 2026!" type="button">Unbelievable tokenization...</button>
+          </div>
+
+          <!-- Mode Explanation Box -->
+          <div id="tokenizer-mode-explanation" style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.86rem;color:var(--text-secondary);">
+          </div>
+
+          <!-- Stats Bar -->
+          <div class="grid-4" style="margin-bottom:20px;">
+            <div class="stat-card">
+              <div class="stat-label">Original Sentence</div>
+              <div class="stat-value" id="tok-stat-chars" style="font-size:1.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">46 chars</div>
+              <div class="stat-desc" id="tok-stat-raw-preview">Raw text length</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Number of Tokens</div>
+              <div class="stat-value" id="tok-stat-count">7</div>
+              <div class="stat-desc">Discrete segments</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Token IDs Array</div>
+              <div class="stat-value font-mono" id="tok-stat-ids" style="font-size:0.95rem;overflow-x:auto;">[...]</div>
+              <div class="stat-desc">Mapped from Vocabulary</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Chars / Token Ratio</div>
+              <div class="stat-value" id="tok-stat-ratio">6.6</div>
+              <div class="stat-desc">Compression efficiency</div>
+            </div>
+          </div>
+
+          <!-- Visual Token Colored Blocks -->
+          <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;">Tokenization Visualization (Colored by Token Type)</span>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:0.74rem;">
+              <span style="color:#ddd6fe;">● Word</span>
+              <span style="color:#a5f3fc;">● Subword Root</span>
+              <span style="color:#a7f3d0;">● Subword Affix (##)</span>
+              <span style="color:#fde68a;">● Punctuation</span>
+              <span style="color:#fecdd3;">● Number</span>
+              <span style="color:#bfdbfe;">● Character</span>
+            </div>
+          </div>
+          <div class="token-stream" id="token-stream-container"></div>
+
+          <!-- Breakdown details -->
+          <div class="grid-2" style="margin-top:18px;">
+            <div style="background:rgba(5,8,16,0.75);border:1px solid var(--border-subtle);border-radius:10px;padding:14px;">
+              <div style="font-size:0.76rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">Individual Tokens Array</div>
+              <code id="tok-array-output" style="font-size:0.84rem;color:var(--cyan-bright);word-break:break-all;"></code>
+            </div>
+            <div style="background:rgba(5,8,16,0.75);border:1px solid var(--border-subtle);border-radius:10px;padding:14px;">
+              <div style="font-size:0.76rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">Assigned Vocabulary Token IDs</div>
+              <code id="tok-id-array-output" style="font-size:0.84rem;color:var(--purple-bright);word-break:break-all;"></code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECTION 3: VOCABULARY
+      =========================================== -->
+      <section id="vocabulary" class="section-block">
+        <div class="section-badge">
+          <span class="dot"></span>
+          <span>Step 02 • The Numerical Lookup Table</span>
+        </div>
+        <h2 class="section-title">Vocabulary</h2>
+        <p class="section-lead">
+          A <strong>vocabulary</strong> in NLP is the complete dictionary of unique tokens a model knows. Every token is assigned a unique integer called a <strong>Token ID</strong> so text can be indexed into numerical arrays.
+        </p>
+
+        <div class="grid-3" style="margin-bottom:24px;">
+          <div class="glass-card">
+            <h3 style="font-size:1.05rem;margin-bottom:6px;color:var(--cyan-bright);">What is an NLP Vocabulary?</h3>
+            <p style="font-size:0.86rem;color:var(--text-secondary);">
+              Just like a phonebook maps names to phone numbers, a vocabulary maps every known word, subword, or punctuation mark to a fixed integer index from <code>1</code> to <code>V</code>.
+            </p>
+          </div>
+          <div class="glass-card">
+            <h3 style="font-size:1.05rem;margin-bottom:6px;color:var(--purple-bright);">Why Token IDs Matter</h3>
+            <p style="font-size:0.86rem;color:var(--text-secondary);">
+              A Token ID is used as a <em>row index</em> to look up that token's embedding vector inside the model's embedding matrix. Without a consistent ID, the model wouldn't know which row to fetch.
+            </p>
+          </div>
+          <div class="glass-card">
+            <h3 style="font-size:1.05rem;margin-bottom:6px;color:var(--emerald);">Dynamic Growth</h3>
+            <p style="font-size:0.86rem;color:var(--text-secondary);">
+              Whenever you tokenize new words in our playground above, unseen tokens are dynamically registered into this live vocabulary table so you can trace their assigned IDs!
+            </p>
+          </div>
+        </div>
+
+        <!-- How Vocabulary Works Interactive Visual Example -->
+        <div class="glass-card accent-cyan" style="margin-bottom:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+            <div>
+              <h3 style="font-size:1.18rem;">How Vocabulary Works — Interactive Visual Mapping</h3>
+              <p style="font-size:0.84rem;color:var(--text-muted);">See how the classic example <code>"I love AI"</code> is tokenized into <code>["I", "love", "AI"]</code> and mapped to <code>[1, 24, 37]</code>.</p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn-chip vocab-demo-preset active" data-phrase="I love AI" type="button">"I love AI"</button>
+              <button class="btn-chip vocab-demo-preset" data-phrase="King Queen Palace" type="button">"King Queen Palace"</button>
+              <button class="btn-chip vocab-demo-preset" data-phrase="Dog Cat Apple" type="button">"Dog Cat Apple"</button>
+            </div>
+          </div>
+
+          <div class="mapping-diagram" id="vocab-visual-mapper">
+            <!-- Populated dynamically by JS, default "I love AI" -> 1, 24, 37 -->
+          </div>
+        </div>
+
+        <!-- Vocabulary Explorer Table & Inspector -->
+        <div class="glass-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
+            <div>
+              <h3 style="font-size:1.18rem;">Interactive Vocabulary Explorer</h3>
+              <p style="font-size:0.84rem;color:var(--text-muted);">
+                Total Vocabulary Size: <strong style="color:var(--cyan-bright);" id="vocab-total-count">56</strong> tokens (Click any row to inspect & highlight)
+              </p>
+            </div>
+
+            <!-- Selected Token Highlight Pill -->
+            <div id="vocab-selected-banner" style="background:rgba(6,182,212,0.14);border:1px solid var(--border-cyan);padding:8px 16px;border-radius:10px;font-size:0.85rem;">
+              Selected Token: <strong class="font-mono" id="vocab-sel-token">"AI"</strong> → Token ID: <strong class="font-mono" style="color:var(--cyan-bright);" id="vocab-sel-id">37</strong> (<span id="vocab-sel-type">Word</span>)
+            </div>
+          </div>
+
+          <!-- Controls: Search, Filter, Sort -->
+          <div class="input-group" style="margin-bottom:16px;">
+            <input
+              type="text"
+              id="vocab-search-input"
+              class="text-input flex-grow"
+              placeholder="Search token or ID (e.g. 'AI', 'King', '24')..."
+              aria-label="Search vocabulary tokens"
+            />
+            <select id="vocab-type-filter" class="select-input" aria-label="Filter by token type">
+              <option value="all">All Token Types</option>
+              <option value="Word">Word</option>
+              <option value="Subword">Subword</option>
+              <option value="Punctuation">Punctuation</option>
+              <option value="Dynamic">User Added (Dynamic)</option>
+            </select>
+            <select id="vocab-sort-select" class="select-input" aria-label="Sort vocabulary">
+              <option value="id-asc">Sort: Token ID (Low → High)</option>
+              <option value="id-desc">Sort: Token ID (High → Low)</option>
+              <option value="alpha-asc">Sort: Token (A → Z)</option>
+              <option value="type">Sort: Token Type</option>
+            </select>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table" id="vocab-table">
+              <thead>
+                <tr>
+                  <th>Token ID</th>
+                  <th>Token</th>
+                  <th>Token Type</th>
+                  <th>Semantic Category</th>
+                  <th>Has 3D Embedding?</th>
+                </tr>
+              </thead>
+              <tbody id="vocab-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECTION 4: WORD EMBEDDINGS
+      =========================================== -->
+      <section id="embeddings" class="section-block">
+        <div class="section-badge">
+          <span class="dot"></span>
+          <span>Step 03 • Capturing Semantic Meaning</span>
+        </div>
+        <h2 class="section-title">Word Embeddings</h2>
+        <p class="section-lead">
+          A Token ID like <code>24</code> or <code>37</code> is just an arbitrary label—it tells us nothing about what a word <em>means</em>. An <strong>embedding</strong> replaces each Token ID with a rich list of numbers (a vector) where each dimension captures a nuance of meaning.
+        </p>
+
+        <!-- Educational Cards -->
+        <div class="grid-2" style="margin-bottom:22px;">
+          <div class="glass-card">
+            <h3 style="font-size:1.08rem;margin-bottom:8px;color:var(--purple-bright);">Token ID vs. Embedding Vector</h3>
+            <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:10px;">
+              In the vocabulary, <code>King</code> might be ID <code>2</code> and <code>Queen</code> might be ID <code>3</code>, while <code>Apple</code> is ID <code>6</code>. You cannot do math on IDs (ID 2 + ID 3 ≠ ID 5).
+            </p>
+            <p style="font-size:0.88rem;color:var(--text-secondary);">
+              An <strong>Embedding Vector</strong> places each word on multiple continuous scales—such as <em>Royalty, Humanity, Technology, Food, Mobility, and Nature</em>—so words with similar meanings have similar coordinates!
+            </p>
+          </div>
+          <div class="glass-card">
+            <h3 style="font-size:1.08rem;margin-bottom:8px;color:var(--cyan-bright);">What Do Vector Dimensions Represent?</h3>
+            <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:10px;">
+              Each number in an embedding vector measures how strongly a word relates to a latent concept. For example:
+            </p>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;background:rgba(5,8,16,0.8);padding:10px 12px;border-radius:8px;color:#e2e8f0;">
+              King   → [Human: 0.92, Royal: 0.96, Tech: 0.05]<br/>
+              Queen  → [Human: 0.93, Royal: 0.95, Tech: 0.05]<br/>
+              Laptop → [Human: 0.04, Royal: 0.02, Tech: 0.96]
+            </div>
+          </div>
+        </div>
+
+        <div class="edu-notice">
+          <span>🔬</span>
+          <div>
+            <strong>Illustrative Embeddings Disclosure:</strong> The vectors below are consistent 8-dimensional illustrative embeddings (with 3D & 2D projections) crafted specifically so you can inspect interpretable semantic axes. Production language models use hundreds or thousands of learned dimensions that are not human-labeled.
+          </div>
+        </div>
+
+        <!-- Interactive Embedding Explorer -->
+        <div class="glass-card accent-purple">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:18px;">
+            <div>
+              <h3 style="font-size:1.2rem;">Interactive Word → Token ID → Embedding Vector Inspector</h3>
+              <p style="font-size:0.84rem;color:var(--text-muted);">Click any word below to inspect its Token ID, numerical vector, dimension breakdown, and related words.</p>
+            </div>
+            <!-- Dimension View Switcher -->
+            <div class="mode-tabs" id="embedding-view-tabs">
+              <button class="mode-tab active" data-view="3d" type="button">3 Dimensions (XYZ)</button>
+              <button class="mode-tab" data-view="2d" type="button">2D Projection</button>
+              <button class="mode-tab" data-view="full" type="button">Full Vector (8D Info)</button>
+            </div>
+          </div>
+
+          <!-- Primary 12 Featured Words + Additional Dataset Toggle -->
+          <div class="word-selector-grid" id="embedding-word-grid"></div>
+
+          <!-- Relationship Pipeline Bar: Word -> Token ID -> Embedding Vector -->
+          <div style="display:grid;grid-template-columns:1fr auto 1fr auto 2fr;align-items:center;gap:12px;background:rgba(5,8,17,0.85);border:1px solid var(--border-subtle);border-radius:12px;padding:16px 20px;margin-bottom:22px;overflow-x:auto;">
+            <div>
+              <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;">1. Word Token</div>
+              <div class="font-display" style="font-size:1.35rem;font-weight:700;color:#fff;" id="emb-pipe-word">King</div>
+            </div>
+            <div style="color:var(--cyan-bright);font-weight:700;">→</div>
+            <div>
+              <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;">2. Token ID</div>
+              <div class="font-mono" style="font-size:1.25rem;font-weight:700;color:var(--purple-bright);" id="emb-pipe-id">#2</div>
+            </div>
+            <div style="color:var(--cyan-bright);font-weight:700;">→</div>
+            <div>
+              <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;" id="emb-pipe-vec-label">3. Embedding Vector (3D)</div>
+              <div class="font-mono" style="font-size:0.92rem;color:var(--cyan-bright);word-break:break-all;" id="emb-pipe-vec">[0.82, 0.91, -0.74]</div>
+            </div>
+          </div>
+
+          <!-- Dynamic View Area: 3D bars / 2D canvas / Full 8D breakdown + Related Words -->
+          <div class="grid-2">
+            <div style="background:rgba(8,12,24,0.8);border:1px solid var(--border-subtle);border-radius:12px;padding:18px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <h4 style="font-size:1rem;color:var(--text-main);" id="emb-detail-heading">3D Vector Coordinates</h4>
+                <span class="font-mono" style="font-size:0.76rem;color:var(--cyan-bright);" id="emb-dim-badge">Dimensions: 3</span>
+              </div>
+              <div id="emb-vector-bars-container"></div>
+              <canvas id="emb-2d-canvas" width="460" height="250" style="width:100%;height:240px;display:none;background:#050811;border-radius:8px;border:1px solid var(--border-subtle);"></canvas>
+            </div>
+
+            <div style="background:rgba(8,12,24,0.8);border:1px solid var(--border-subtle);border-radius:12px;padding:18px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h4 style="font-size:1rem;color:var(--text-main);">Closest Semantic Neighbors</h4>
+                <button class="btn-chip" id="emb-jump-3d-btn" type="button">Inspect in 3D Space →</button>
+              </div>
+              <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;">
+                Words with the highest cosine similarity to <strong id="emb-rel-word-name" style="color:#fff;">King</strong> based on vector alignment:
+              </p>
+              <div id="emb-related-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECTION 5: INTERACTIVE 3D EMBEDDING SPACE
+      =========================================== -->
+      <section id="space-3d" class="section-block">
+        <div class="section-badge">
+          <span class="dot"></span>
+          <span>Step 04 • Visual Centerpiece</span>
+        </div>
+        <h2 class="section-title">Interactive 3D Embedding Space</h2>
+        <p class="section-lead">
+          Explore our 36-word embedding dataset inside a live 3D coordinate system. Words with similar meanings cluster together in space, and glowing beams connect your selected word to its closest cosine-similarity neighbors.
+        </p>
+
+        <!-- Controls Bar Above 3D Canvas -->
+        <div class="glass-card" style="padding:16px 20px;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1;">
+              <input
+                type="text"
+                id="space-search-input"
+                class="text-input"
+                style="padding:8px 14px;font-size:0.86rem;min-width:210px;"
+                placeholder="Search word in 3D space (e.g. King, Dog, AI)..."
+                aria-label="Search word in 3D space"
+              />
+              <button class="btn-secondary" id="space-search-btn" type="button" style="padding:8px 14px;">Find & Focus</button>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <button class="btn-secondary" id="space-toggle-orbit" type="button" style="padding:8px 14px;border-color:var(--border-purple);">3D Orbit: ON</button>
+              <button class="btn-secondary" id="space-toggle-labels" type="button" style="padding:8px 14px;">Labels: ON</button>
+              <button class="btn-secondary" id="space-toggle-lines" type="button" style="padding:8px 14px;">Neighbor Lines: ON</button>
+              <button class="btn-secondary" id="space-zoom-in" type="button" style="padding:8px 12px;" title="Zoom In">＋</button>
+              <button class="btn-secondary" id="space-zoom-out" type="button" style="padding:8px 12px;" title="Zoom Out">－</button>
+              <button class="btn-secondary" id="space-reset-cam" type="button" style="padding:8px 14px;">Reset Camera</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Viewport + Side Inspector Panel -->
+        <div class="space-3d-layout">
+          <div class="canvas-3d-wrapper" id="canvas-3d-wrapper">
+            <canvas id="three-webgl-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:none;pointer-events:none;"></canvas>
+            <canvas id="embedding-3d-canvas" style="position:relative;z-index:2;"></canvas>
+            <div class="tooltip-3d" id="tooltip-3d"></div>
+
+            <!-- Top Overlay: Category Legend Toggles -->
+            <div class="canvas-overlay-top">
+              <div class="legend-bar" id="space-category-legend" aria-label="Word Category Filter">
+                <!-- Populated by JS -->
+              </div>
+              <div style="background:rgba(7,10,20,0.82);padding:6px 12px;border-radius:8px;border:1px solid var(--border-subtle);font-size:0.74rem;color:var(--text-muted);" id="space-engine-badge">
+                3D Engine Active • Drag to Rotate • Scroll to Zoom • Shift+Drag to Pan
+              </div>
+            </div>
+
+            <!-- Bottom Overlay: Active Coordinates & Selection Quick Pill -->
+            <div class="canvas-overlay-bottom">
+              <div style="background:rgba(7,10,20,0.86);padding:8px 14px;border-radius:8px;border:1px solid var(--border-subtle);font-size:0.78rem;" class="font-mono" id="space-xyz-readout">
+                Selected: King • XYZ: (0.82, 0.91, -0.74)
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn-chip space-quick-word" data-word="King" type="button">King</button>
+                <button class="btn-chip space-quick-word" data-word="Apple" type="button">Apple</button>
+                <button class="btn-chip space-quick-word" data-word="Computer" type="button">Computer</button>
+                <button class="btn-chip space-quick-word" data-word="Dog" type="button">Dog</button>
+                <button class="btn-chip space-quick-word" data-word="Car" type="button">Car</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Inspector Panel -->
+          <div class="glass-card accent-cyan" style="display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--cyan-bright);font-weight:600;" id="space-info-cat">PEOPLE</span>
+                <span class="font-mono" style="font-size:0.78rem;color:var(--text-muted);" id="space-info-id">Token ID #2</span>
+              </div>
+              <h3 style="font-size:1.65rem;margin-bottom:6px;" id="space-info-word">King</h3>
+              <p style="font-size:0.83rem;color:var(--text-muted);margin-bottom:16px;" id="space-info-desc">
+                Male monarch; clusters tightly with Queen, Prince, Crown, and Palace in semantic space.
+              </p>
+
+              <!-- Visible XYZ Coordinates Box -->
+              <div style="background:rgba(5,8,16,0.85);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;margin-bottom:16px;">
+                <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">3D Embedding Coordinates (X, Y, Z)</div>
+                <div class="grid-3 font-mono" style="gap:8px;text-align:center;font-size:0.86rem;">
+                  <div style="background:rgba(139,92,246,0.15);padding:6px;border-radius:6px;color:#ddd6fe;">
+                    X: <span id="space-coord-x">0.82</span>
+                  </div>
+                  <div style="background:rgba(6,182,212,0.15);padding:6px;border-radius:6px;color:#a5f3fc;">
+                    Y: <span id="space-coord-y">0.91</span>
+                  </div>
+                  <div style="background:rgba(16,185,129,0.15);padding:6px;border-radius:6px;color:#a7f3d0;">
+                    Z: <span id="space-coord-z">-0.74</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nearest Neighbors in 3D Space -->
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">
+                Closest Connected Words (Cosine Similarity)
+              </div>
+              <div id="space-neighbors-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+            </div>
+
+            <div style="margin-top:18px;padding-top:12px;border-top:1px solid var(--border-subtle);font-size:0.76rem;color:var(--text-dim);">
+              Tip: Click any neighbor above or any glowing sphere in the 3D scene to smoothly focus the camera and recalculate similarity connections.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECTION 6: CLOSEST PAIRS (COSINE SIMILARITY)
+      =========================================== -->
+      <section id="closest-pairs" class="section-block">
+        <div class="section-badge">
+          <span class="dot"></span>
+          <span>Step 05 • Measuring Semantic Closeness</span>
+        </div>
+        <h2 class="section-title">Closest Pairs & Cosine Similarity</h2>
+        <p class="section-lead">
+          How does a machine know that <strong>King</strong> is closer to <strong>Queen</strong> than to <strong>Apple</strong>? It measures the angle between their embedding vectors using <strong>Cosine Similarity</strong>.
+        </p>
+
+        <!-- Formula + Beginner Explanation -->
+        <div class="grid-2" style="margin-bottom:24px;">
+          <div class="glass-card">
+            <h3 style="font-size:1.12rem;margin-bottom:8px;">The Cosine Similarity Formula</h3>
+            <div class="formula-box">
+              Cosine Similarity = (A · B) / (||A|| × ||B||)
+            </div>
+            <ul style="font-size:0.86rem;color:var(--text-secondary);padding-left:18px;display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+              <li><strong>Dot Product (A · B):</strong> Multiplies matching coordinates of vector A and vector B and sums them up: <code>∑(Aᵢ × Bᵢ)</code>.</li>
+              <li><strong>Vector Magnitude (||A|| × ||B||):</strong> The length of each vector from the origin <code>√∑(Aᵢ²)</code>. Dividing by length ensures we only compare <em>direction</em>, not arrow length.</li>
+              <li><strong>Similarity Score:</strong> Ranges from <strong>+1.00</strong> (pointing in the exact same direction) to <strong>0.00</strong> (unrelated / 90° perpendicular) to <strong>-1.00</strong> (opposite).</li>
+            </ul>
+          </div>
+
+          <!-- Visual Angle Explanation Widget -->
+          <div class="glass-card accent-cyan">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+              <h3 style="font-size:1.12rem;">Interactive Vector Angle Visualizer</h3>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <select id="angle-word-a" class="select-input" style="padding:6px 10px;font-size:0.82rem;" aria-label="First word for angle comparison"></select>
+                <span style="color:var(--text-muted);font-size:0.8rem;">vs</span>
+                <select id="angle-word-b" class="select-input" style="padding:6px 10px;font-size:0.82rem;" aria-label="Second word for angle comparison"></select>
+              </div>
+            </div>
+            <canvas id="cosine-angle-canvas" width="460" height="210" style="width:100%;height:200px;background:#050811;border-radius:10px;border:1px solid var(--border-subtle);"></canvas>
+            <div id="cosine-math-readout" class="font-mono" style="margin-top:10px;font-size:0.78rem;color:var(--text-secondary);background:rgba(5,8,16,0.75);padding:10px 12px;border-radius:8px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Closest Pairs Explorer & 5-Nearest Neighbor Finder -->
+        <div class="grid-2">
+          <!-- Left: Top Closest Word Pairs Table -->
+          <div class="glass-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+              <div>
+                <h3 style="font-size:1.15rem;">Closest Word Pairs Dataset</h3>
+                <p style="font-size:0.8rem;color:var(--text-muted);">Live calculated scores from our 36-word embedding vectors.</p>
+              </div>
+              <select id="pairs-sort-select" class="select-input" style="padding:7px 12px;font-size:0.82rem;" aria-label="Sort closest pairs">
+                <option value="top10">Top 10 Closest Pairs</option>
+                <option value="desc">All Featured Pairs (High → Low)</option>
+                <option value="asc">All Featured Pairs (Low → High)</option>
+              </select>
+            </div>
+
+            <div class="input-group" style="margin-bottom:12px;">
+              <input
+                type="text"
+                id="pairs-search-input"
+                class="text-input flex-grow"
+                style="padding:9px 14px;font-size:0.86rem;"
+                placeholder="Filter pairs by word (e.g. King, Apple, Dog, Car)..."
+                aria-label="Filter word pairs"
+              />
+            </div>
+
+            <div class="table-container" style="max-height:370px;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Word 1</th>
+                    <th>Word 2</th>
+                    <th>Cosine Similarity</th>
+                    <th>3D Link</th>
+                  </tr>
+                </thead>
+                <tbody id="closest-pairs-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Select a Word & Find Its 5 Closest Neighbors -->
+          <div class="glass-card accent-purple">
+            <h3 style="font-size:1.15rem;margin-bottom:6px;">Find a Word's 5 Closest Neighbors</h3>
+            <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:16px;">
+              Select any word from the dataset to compute its cosine similarity against every other word and rank its top 5 closest matches.
+            </p>
+
+            <div class="input-group" style="margin-bottom:18px;">
+              <select id="neighbor-finder-select" class="select-input flex-grow" aria-label="Select word to find 5 closest neighbors"></select>
+              <button class="btn-secondary" id="neighbor-show-3d-btn" type="button">Show Cluster in 3D →</button>
+            </div>
+
+            <div id="neighbor-finder-results" style="display:flex;flex-direction:column;gap:12px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECTION 7: TRY YOUR OWN WORD OR SENTENCE
+      =========================================== -->
+      <section id="experiment" class="section-block">
+        <div class="section-badge">
+          <span class="dot"></span>
+          <span>Step 06 • End-to-End NLP Pipeline Lab</span>
+        </div>
+        <h2 class="section-title">Try Your Own Word or Sentence</h2>
+        <p class="section-lead">
+          Enter a single word, multiple words, or a complete sentence below and click <strong>Analyze</strong> to trace the entire 6-step NLP pipeline from raw text to 3D vector space.
+        </p>
+
+        <div class="glass-card accent-purple">
+          <div class="input-group">
+            <input
+              type="text"
+              id="experiment-input"
+              class="text-input flex-grow"
+              value="The king is sitting in the palace."
+              placeholder="Enter a word or complete sentence (e.g. 'The king is sitting in the palace.')"
+              aria-label="Experiment sentence input"
+            />
+            <button class="btn-primary" id="experiment-analyze-btn" type="button">Analyze</button>
+            <button class="btn-secondary" id="experiment-clear-btn" type="button">Clear All</button>
+          </div>
+
+          <!-- Quick Experiment Prompts -->
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+            <span style="font-size:0.78rem;color:var(--text-dim);">Quick prompts:</span>
+            <button class="btn-chip exp-sample" data-text="The king is sitting in the palace." type="button">"The king is sitting in the palace."</button>
+            <button class="btn-chip exp-sample" data-text="A dog and a cat shared an apple and orange." type="button">"A dog and a cat shared an apple..."</button>
+            <button class="btn-chip exp-sample" data-text="An AI robot uses a laptop computer in a car." type="button">"An AI robot uses a laptop..."</button>
+            <button class="btn-chip exp-sample" data-text="Queen and woman driving a fast vehicle." type="button">"Queen and woman driving..."</button>
+            <button class="btn-chip exp-sample" data-text="Galactic hyperdrive spaceships!" type="button">Test Unknown Words</button>
+          </div>
+
+          <!-- Summary Stats Row -->
+          <div class="grid-4" style="margin-bottom:22px;" id="exp-summary-stats">
+            <div class="stat-card">
+              <div class="stat-label">Total Tokens</div>
+              <div class="stat-value" id="exp-stat-tokens">8</div>
+              <div class="stat-desc">Extracted segments</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Vocabulary Matches</div>
+              <div class="stat-value" id="exp-stat-vocab">8 / 8</div>
+              <div class="stat-desc">Assigned Token IDs</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Known Embeddings</div>
+              <div class="stat-value" id="exp-stat-emb">2 Words</div>
+              <div class="stat-desc">In 36-word vector dataset</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Unsupported / Stopwords</div>
+              <div class="stat-value" id="exp-stat-unk">6 Tokens</div>
+              <div class="stat-desc">No semantic vector in demo</div>
+            </div>
+          </div>
+
+          <!-- 6-Step Pipeline Container -->
+          <div id="experiment-pipeline-output">
+            <!-- Step 1: Input Text -->
+            <div class="exp-step-card">
+              <div class="exp-step-header">
+                <span class="exp-step-tag">STEP 1: INPUT TEXT</span>
+                <span style="font-size:0.78rem;color:var(--text-muted);" id="exp-step1-meta"></span>
+              </div>
+              <div id="exp-step1-body" class="font-mono" style="font-size:1rem;color:#fff;background:rgba(5,8,16,0.75);padding:12px 16px;border-radius:8px;"></div>
+            </div>
+
+            <!-- Step 2: Tokenization -->
+            <div class="exp-step-card">
+              <div class="exp-step-header">
+                <span class="exp-step-tag">STEP 2: TOKENIZATION</span>
+                <span style="font-size:0.78rem;color:var(--text-muted);">Word & punctuation segmentation</span>
+              </div>
+              <div id="exp-step2-body" class="token-stream" style="min-height:54px;"></div>
+            </div>
+
+            <!-- Step 3: Vocabulary Lookup -->
+            <div class="exp-step-card">
+              <div class="exp-step-header">
+                <span class="exp-step-tag">STEP 3: VOCABULARY LOOKUP</span>
+                <span style="font-size:0.78rem;color:var(--text-muted);">Mapping tokens to integer IDs</span>
+              </div>
+              <div id="exp-step3-body" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+            </div>
+
+            <!-- Step 4: Embeddings -->
+            <div class="exp-step-card">
+              <div class="exp-step-header">
+                <span class="exp-step-tag">STEP 4: EMBEDDINGS</span>
+                <span style="font-size:0.78rem;color:var(--text-muted);">Retrieving vectors from our 36-word demonstration dataset</span>
+              </div>
+              <div id="exp-step4-body"></div>
+            </div>
+
+            <!-- Step 5: Similarity -->
+            <div class="exp-step-card">
+              <div class="exp-step-header">
+                <span class="exp-step-tag">STEP 5: SIMILARITY</span>
+                <span style="font-size:0.78rem;color:var(--text-muted);">Cosine similarity to closest words in the dataset</span>
+              </div>
+              <div id="exp-step5-body"></div>
+            </div>
+
+            <!-- Step 6: Visualization -->
+            <div class="exp-step-card" style="border-left-color:var(--cyan-bright);margin-bottom:0;">
+              <div class="exp-step-header">
+                <span class="exp-step-tag">STEP 6: VISUALIZATION & SUMMARY</span>
+                <button class="btn-primary" id="exp-highlight-3d-btn" type="button" style="padding:8px 16px;font-size:0.82rem;">
+                  Highlight in 3D Embedding Space ↑
+                </button>
+              </div>
+              <div id="exp-step6-body"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================
+       COMPLETE APPLICATION LOGIC (VANILLA JS)
+  =========================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---------------------------------------------------------
+         1. CONSISTENT ILLUSTRATIVE EMBEDDING DATASET (36 WORDS)
+         8 Semantic Dimensions:
+         [0] Human/Social, [1] Royalty/Authority, [2] Gender Polarity (-F/+M),
+         [3] Biology/Animal, [4] Food/Organic, [5] Technology/Digital,
+         [6] Mobility/Transport, [7] Scale/Structure
+         And explicit, consistent 3D coordinates (x, y, z) in [-1.2, 1.2]
+      --------------------------------------------------------- */
+      const DIMENSION_NAMES = [
+        'Human / Social',
+        'Royalty / Status',
+        'Leadership / Agency',
+        'Animal / Nature',
+        'Food / Organic',
+        'Technology / Compute',
+        'Transport / Motion',
+        'Scale / Structure'
+      ];
+
+      const CATEGORY_COLORS = {
+        People: '#a855f7',         // Electric Purple
+        Animals: '#10b981',        // Emerald Green
+        Food: '#f59e0b',           // Amber Orange
+        Technology: '#06b6d4',     // Cyan / Turquoise
+        Transportation: '#3b82f6', // Royal Blue
+        Other: '#f43f5e'           // Rose Pink
+      };
+
+      const EMBEDDING_DATASET = [
+        // People (8)
+        { word: 'King', id: 2, category: 'People', featured: true, xyz: [0.85, 0.92, -0.68], vec8: [0.92, 0.97, 0.90, 0.10, 0.04, 0.04, 0.08, 0.74], desc: 'Male monarch; shares strong Royalty and Human dimensions with Queen and Prince.' },
+        { word: 'Queen', id: 3, category: 'People', featured: true, xyz: [0.81, 0.90, -0.58], vec8: [0.93, 0.96, 0.88, 0.10, 0.05, 0.04, 0.08, 0.72], desc: 'Female monarch; closely aligned with King across Royalty and Human axes.' },
+        { word: 'Man', id: 4, category: 'People', featured: true, xyz: [0.68, 0.45, -0.62], vec8: [0.96, 0.16, 0.64, 0.18, 0.08, 0.12, 0.15, 0.40], desc: 'Adult male human; shares Human and Social features with Woman and King.' },
+        { word: 'Woman', id: 5, category: 'People', featured: true, xyz: [0.64, 0.44, -0.52], vec8: [0.97, 0.16, 0.62, 0.18, 0.09, 0.12, 0.15, 0.39], desc: 'Adult female human; closely parallels Man on Human axes and Queen on Social axes.' },
+        { word: 'Prince', id: 14, category: 'People', featured: false, xyz: [0.78, 0.82, -0.64], vec8: [0.90, 0.86, 0.75, 0.12, 0.06, 0.06, 0.12, 0.58], desc: 'Young royal male; clusters tightly between King and Man.' },
+        { word: 'Princess', id: 15, category: 'People', featured: false, xyz: [0.75, 0.80, -0.54], vec8: [0.91, 0.85, 0.73, 0.12, 0.07, 0.06, 0.12, 0.56], desc: 'Young royal female; clusters tightly between Queen and Woman.' },
+        { word: 'Doctor', id: 16, category: 'People', featured: false, xyz: [0.58, 0.35, -0.32], vec8: [0.91, 0.35, 0.70, 0.22, 0.10, 0.34, 0.14, 0.45], desc: 'Medical professional; high Human & Social score with moderate Science/Tech.' },
+        { word: 'Teacher', id: 17, category: 'People', featured: false, xyz: [0.54, 0.30, -0.28], vec8: [0.93, 0.30, 0.68, 0.18, 0.08, 0.30, 0.12, 0.42], desc: 'Educator; clusters closely with Doctor, Man, and Woman in the People region.' },
+
+        // Food (6)
+        { word: 'Apple', id: 6, category: 'Food', featured: true, xyz: [-0.78, 0.65, 0.62], vec8: [0.06, 0.04, 0.00, 0.42, 0.96, 0.05, 0.04, 0.18], desc: 'Crisp orchard fruit; nearly identical semantic direction to Orange and Banana.' },
+        { word: 'Orange', id: 7, category: 'Food', featured: true, xyz: [-0.82, 0.62, 0.66], vec8: [0.05, 0.03, 0.00, 0.40, 0.97, 0.03, 0.04, 0.17], desc: 'Citrus fruit; forms one of the tightest cosine similarity pairs with Apple.' },
+        { word: 'Banana', id: 18, category: 'Food', featured: false, xyz: [-0.75, 0.58, 0.70], vec8: [0.05, 0.03, 0.02, 0.44, 0.95, 0.02, 0.04, 0.16], desc: 'Tropical fruit; clusters right beside Apple and Orange.' },
+        { word: 'Bread', id: 19, category: 'Food', featured: false, xyz: [-0.66, 0.48, 0.52], vec8: [0.14, 0.06, 0.00, 0.25, 0.92, 0.04, 0.05, 0.22], desc: 'Baked staple food; high Food/Organic dimension.' },
+        { word: 'Pizza', id: 20, category: 'Food', featured: false, xyz: [-0.62, 0.42, 0.48], vec8: [0.18, 0.05, 0.01, 0.20, 0.90, 0.06, 0.08, 0.25], desc: 'Prepared dish; neighbors Bread, Apple, and Coffee.' },
+        { word: 'Coffee', id: 21, category: 'Food', featured: false, xyz: [-0.55, 0.36, 0.42], vec8: [0.22, 0.08, 0.00, 0.28, 0.86, 0.12, 0.06, 0.20], desc: 'Brewed beverage; bridges Food/Organic with everyday human activity.' },
+
+        // Transportation (6)
+        { word: 'Car', id: 8, category: 'Transportation', featured: true, xyz: [-0.72, -0.74, -0.58], vec8: [0.12, 0.10, 0.04, 0.02, 0.02, 0.58, 0.96, 0.65], desc: 'Passenger automobile; extremely high cosine similarity with Vehicle and Truck.' },
+        { word: 'Vehicle', id: 9, category: 'Transportation', featured: true, xyz: [-0.68, -0.70, -0.54], vec8: [0.10, 0.08, 0.02, 0.02, 0.02, 0.56, 0.97, 0.68], desc: 'General transport machine; nearly collinear with Car and Truck.' },
+        { word: 'Truck', id: 22, category: 'Transportation', featured: false, xyz: [-0.76, -0.78, -0.62], vec8: [0.10, 0.06, 0.08, 0.02, 0.02, 0.52, 0.95, 0.78], desc: 'Heavy transport vehicle; clusters right alongside Car and Vehicle.' },
+        { word: 'Train', id: 23, category: 'Transportation', featured: false, xyz: [-0.62, -0.82, -0.48], vec8: [0.14, 0.08, 0.04, 0.02, 0.02, 0.54, 0.92, 0.85], desc: 'Rail transport; shares high Mobility and Scale scores with Airplane and Vehicle.' },
+        { word: 'Airplane', id: 25, category: 'Transportation', featured: false, xyz: [-0.54, -0.86, -0.42], vec8: [0.12, 0.12, 0.02, 0.04, 0.01, 0.68, 0.94, 0.88], desc: 'High-speed aircraft; combines high Transport and Technology dimensions.' },
+        { word: 'Bicycle', id: 26, category: 'Transportation', featured: false, xyz: [-0.60, -0.58, -0.66], vec8: [0.22, 0.04, 0.00, 0.06, 0.02, 0.32, 0.88, 0.35], desc: 'Human-powered two-wheeler; located on the lighter edge of the Transport cluster.' },
+
+        // Animals (6)
+        { word: 'Dog', id: 10, category: 'Animals', featured: true, xyz: [0.72, -0.68, 0.68], vec8: [0.28, 0.05, 0.14, 0.96, 0.14, 0.02, 0.24, 0.32], desc: 'Domestic canine companion; shares very high Animal similarity with Cat and Wolf.' },
+        { word: 'Cat', id: 11, category: 'Animals', featured: true, xyz: [0.68, -0.64, 0.72], vec8: [0.26, 0.06, 0.12, 0.95, 0.14, 0.02, 0.22, 0.28], desc: 'Domestic feline companion; pairs tightly with Dog in the Animals cluster.' },
+        { word: 'Wolf', id: 27, category: 'Animals', featured: false, xyz: [0.80, -0.74, 0.62], vec8: [0.10, 0.12, 0.10, 0.97, 0.12, 0.01, 0.28, 0.42], desc: 'Wild canine predator; close neighbor to Dog, Lion, and Tiger.' },
+        { word: 'Lion', id: 28, category: 'Animals', featured: false, xyz: [0.86, -0.70, 0.55], vec8: [0.12, 0.32, 0.14, 0.96, 0.12, 0.01, 0.26, 0.52], desc: 'Apex feline predator ("king of beasts"); neighbors Tiger, Wolf, and Cat.' },
+        { word: 'Tiger', id: 29, category: 'Animals', featured: false, xyz: [0.84, -0.76, 0.58], vec8: [0.10, 0.24, 0.10, 0.97, 0.12, 0.01, 0.28, 0.50], desc: 'Large striped feline; tightly paired with Lion and Wolf.' },
+        { word: 'Bird', id: 30, category: 'Animals', featured: false, xyz: [0.60, -0.56, 0.78], vec8: [0.14, 0.04, -0.02, 0.92, 0.18, 0.02, 0.35, 0.18], desc: 'Feathered flying vertebrate; sits in the Animals cluster near Cat and Dog.' },
+
+        // Technology (6)
+        { word: 'Computer', id: 12, category: 'Technology', featured: true, xyz: [0.18, -0.15, -0.88], vec8: [0.12, 0.06, 0.00, 0.02, 0.02, 0.98, 0.18, 0.48], desc: 'General-purpose digital machine; nearly identical vector direction to Laptop.' },
+        { word: 'Laptop', id: 13, category: 'Technology', featured: true, xyz: [0.22, -0.12, -0.84], vec8: [0.14, 0.06, 0.00, 0.02, 0.02, 0.97, 0.22, 0.42], desc: 'Portable personal computer; forms a top closest pair with Computer and Phone.' },
+        { word: 'AI', id: 37, category: 'Technology', featured: false, xyz: [0.32, 0.08, -0.92], vec8: [0.28, 0.12, 0.00, 0.04, 0.01, 0.96, 0.16, 0.54], desc: 'Artificial Intelligence (Token ID #37); bridges Technology with Human cognition.' },
+        { word: 'Robot', id: 31, category: 'Technology', featured: false, xyz: [0.36, 0.02, -0.86], vec8: [0.32, 0.08, 0.02, 0.06, 0.01, 0.94, 0.34, 0.52], desc: 'Autonomous machine; closely aligned with AI, Computer, and Laptop.' },
+        { word: 'Phone', id: 32, category: 'Technology', featured: false, xyz: [0.25, -0.08, -0.78], vec8: [0.22, 0.05, 0.00, 0.02, 0.02, 0.94, 0.24, 0.30], desc: 'Mobile communication device; neighbors Laptop and Computer.' },
+        { word: 'Server', id: 33, category: 'Technology', featured: false, xyz: [0.12, -0.22, -0.94], vec8: [0.06, 0.08, 0.00, 0.01, 0.01, 0.98, 0.12, 0.66], desc: 'Data center hardware; clusters tightly with Computer and AI.' },
+
+        // Other (4)
+        { word: 'Palace', id: 34, category: 'Other', featured: false, xyz: [0.62, 0.86, -0.20], vec8: [0.48, 0.90, 0.00, 0.04, 0.04, 0.08, 0.06, 0.92], desc: 'Royal residence; high Royalty and Scale scores place it near King, Queen, and Crown.' },
+        { word: 'Crown', id: 35, category: 'Other', featured: false, xyz: [0.70, 0.94, -0.30], vec8: [0.42, 0.96, 0.00, 0.02, 0.02, 0.04, 0.04, 0.55], desc: 'Symbol of monarchy; strong Royalty alignment with King, Queen, and Palace.' },
+        { word: 'City', id: 36, category: 'Other', featured: false, xyz: [0.35, 0.52, -0.12], vec8: [0.62, 0.42, 0.00, 0.08, 0.12, 0.42, 0.45, 0.95], desc: 'Urban human settlement; connects People, Transport, and Palace.' },
+        { word: 'Book', id: 38, category: 'Other', featured: false, xyz: [0.42, 0.28, -0.18], vec8: [0.65, 0.24, 0.00, 0.06, 0.08, 0.45, 0.08, 0.32], desc: 'Written knowledge medium; bridges Teacher, People, and Technology.' }
+      ];
+
+      // Map for fast case-insensitive lookup of embedding entries
+      const EMBEDDING_BY_LOWER = new Map();
+      EMBEDDING_DATASET.forEach(item => {
+        EMBEDDING_BY_LOWER.set(item.word.toLowerCase(), item);
+      });
+
+      /* ---------------------------------------------------------
+         2. VOCABULARY TABLE (56+ Pre-populated Tokens)
+         Includes exact mapping: I -> 1, love -> 24, AI -> 37
+      --------------------------------------------------------- */
+      const INITIAL_VOCABULARY = [
+        { id: 1, token: 'I', type: 'Word', category: 'People' },
+        { id: 2, token: 'King', type: 'Word', category: 'People' },
+        { id: 3, token: 'Queen', type: 'Word', category: 'People' },
+        { id: 4, token: 'Man', type: 'Word', category: 'People' },
+        { id: 5, token: 'Woman', type: 'Word', category: 'People' },
+        { id: 6, token: 'Apple', type: 'Word', category: 'Food' },
+        { id: 7, token: 'Orange', type: 'Word', category: 'Food' },
+        { id: 8, token: 'Car', type: 'Word', category: 'Transportation' },
+        { id: 9, token: 'Vehicle', type: 'Word', category: 'Transportation' },
+        { id: 10, token: 'Dog', type: 'Word', category: 'Animals' },
+        { id: 11, token: 'Cat', type: 'Word', category: 'Animals' },
+        { id: 12, token: 'Computer', type: 'Word', category: 'Technology' },
+        { id: 13, token: 'Laptop', type: 'Word', category: 'Technology' },
+        { id: 14, token: 'Prince', type: 'Word', category: 'People' },
+        { id: 15, token: 'Princess', type: 'Word', category: 'People' },
+        { id: 16, token: 'Doctor', type: 'Word', category: 'People' },
+        { id: 17, token: 'Teacher', type: 'Word', category: 'People' },
+        { id: 18, token: 'Banana', type: 'Word', category: 'Food' },
+        { id: 19, token: 'Bread', type: 'Word', category: 'Food' },
+        { id: 20, token: 'Pizza', type: 'Word', category: 'Food' },
+        { id: 21, token: 'Coffee', type: 'Word', category: 'Food' },
+        { id: 22, token: 'Truck', type: 'Word', category: 'Transportation' },
+        { id: 23, token: 'Train', type: 'Word', category: 'Transportation' },
+        { id: 24, token: 'love', type: 'Word', category: 'Other' },
+        { id: 25, token: 'Airplane', type: 'Word', category: 'Transportation' },
+        { id: 26, token: 'Bicycle', type: 'Word', category: 'Transportation' },
+        { id: 27, token: 'Wolf', type: 'Word', category: 'Animals' },
+        { id: 28, token: 'Lion', type: 'Word', category: 'Animals' },
+        { id: 29, token: 'Tiger', type: 'Word', category: 'Animals' },
+        { id: 30, token: 'Bird', type: 'Word', category: 'Animals' },
+        { id: 31, token: 'Robot', type: 'Word', category: 'Technology' },
+        { id: 32, token: 'Phone', type: 'Word', category: 'Technology' },
+        { id: 33, token: 'Server', type: 'Word', category: 'Technology' },
+        { id: 34, token: 'Palace', type: 'Word', category: 'Other' },
+        { id: 35, token: 'Crown', type: 'Word', category: 'Other' },
+        { id: 36, token: 'City', type: 'Word', category: 'Other' },
+        { id: 37, token: 'AI', type: 'Word', category: 'Technology' },
+        { id: 38, token: 'Book', type: 'Word', category: 'Other' },
+        { id: 39, token: 'the', type: 'Word', category: 'Other' },
+        { id: 40, token: 'is', type: 'Word', category: 'Other' },
+        { id: 41, token: 'in', type: 'Word', category: 'Other' },
+        { id: 42, token: 'and', type: 'Word', category: 'Other' },
+        { id: 43, token: 'a', type: 'Word', category: 'Other' },
+        { id: 44, token: 'Artificial', type: 'Word', category: 'Technology' },
+        { id: 45, token: 'intelligence', type: 'Word', category: 'Technology' },
+        { id: 46, token: 'changing', type: 'Word', category: 'Other' },
+        { id: 47, token: 'world', type: 'Word', category: 'Other' },
+        { id: 48, token: 'sitting', type: 'Word', category: 'Other' },
+        { id: 49, token: '##ing', type: 'Subword', category: 'Other' },
+        { id: 50, token: '##ence', type: 'Subword', category: 'Other' },
+        { id: 51, token: '##tion', type: 'Subword', category: 'Other' },
+        { id: 52, token: '##able', type: 'Subword', category: 'Other' },
+        { id: 53, token: 'un##', type: 'Subword', category: 'Other' },
+        { id: 54, token: '.', type: 'Punctuation', category: 'Other' },
+        { id: 55, token: ',', type: 'Punctuation', category: 'Other' },
+        { id: 56, token: '!', type: 'Punctuation', category: 'Other' }
+      ];
+
+      let vocabularyList = [...INITIAL_VOCABULARY];
+      const vocabByLower = new Map();
+      vocabularyList.forEach(entry => {
+        vocabByLower.set(entry.token.toLowerCase(), entry);
+      });
+
+      function getOrRegisterToken(tokenStr, tokenTypeLabel) {
+        const key = tokenStr.toLowerCase();
+        if (vocabByLower.has(key)) {
+          return vocabByLower.get(key);
+        }
+        const nextId = vocabularyList.length + 1;
+        let normType = 'Dynamic';
+        if (tokenTypeLabel === 'punctuation') normType = 'Punctuation';
+        else if (tokenTypeLabel && tokenTypeLabel.startsWith('subword')) normType = 'Subword';
+
+        const newEntry = {
+          id: nextId,
+          token: tokenStr,
+          type: normType,
+          category: 'Other',
+          isDynamic: true
+        };
+        vocabularyList.push(newEntry);
+        vocabByLower.set(key, newEntry);
+        updateVocabCounters();
+        return newEntry;
+      }
+
+      function updateVocabCounters() {
+        const totalEl = document.getElementById('vocab-total-count');
+        const heroStatEl = document.getElementById('hero-stat-vocab');
+        if (totalEl) totalEl.textContent = String(vocabularyList.length);
+        if (heroStatEl) heroStatEl.textContent = vocabularyList.length + ' Tokens';
+      }
+
+      /* ---------------------------------------------------------
+         3. MATHEMATICAL COSINE SIMILARITY FUNCTIONS
+      --------------------------------------------------------- */
+      function dotProduct(vecA, vecB) {
+        let sum = 0;
+        const len = Math.min(vecA.length, vecB.length);
+        for (let i = 0; i < len; i++) {
+          sum += vecA[i] * vecB[i];
+        }
+        return sum;
+      }
+
+      function magnitude(vec) {
+        let sumSq = 0;
+        for (let i = 0; i < vec.length; i++) {
+          sumSq += vec[i] * vec[i];
+        }
+        return Math.sqrt(sumSq);
+      }
+
+      function cosineSimilarity(vecA, vecB) {
+        const magA = magnitude(vecA);
+        const magB = magnitude(vecB);
+        if (magA === 0 || magB === 0) return 0;
+        const raw = dotProduct(vecA, vecB) / (magA * magB);
+        return Math.max(-1, Math.min(1, raw));
+      }
+
+      function getTopNeighborsForWord(wordStr, count = 5) {
+        const target = EMBEDDING_BY_LOWER.get(wordStr.toLowerCase());
+        if (!target) return [];
+        const scored = [];
+        for (let i = 0; i < EMBEDDING_DATASET.length; i++) {
+          const item = EMBEDDING_DATASET[i];
+          if (item.word.toLowerCase() === target.word.toLowerCase()) continue;
+          const sim = cosineSimilarity(target.vec8, item.vec8);
+          scored.push({
+            word: item.word,
+            id: item.id,
+            category: item.category,
+            xyz: item.xyz,
+            vec8: item.vec8,
+            similarity: sim
+          });
+        }
+        scored.sort((a, b) => b.similarity - a.similarity);
+        return scored.slice(0, count);
+      }
+
+      /* ---------------------------------------------------------
+         4. HERO PIPELINE ANIMATION
+      --------------------------------------------------------- */
+      const HERO_EXAMPLES = [
+        {
+          text: '"I love AI"',
+          tokens: '["I", "love", "AI"]',
+          numbers: '[1, 24, 37]',
+          vectors: '[0.28, 0.12, 0.96...]',
+          meaning: 'cos(AI, Robot) = 0.99'
+        },
+        {
+          text: '"King and Queen"',
+          tokens: '["King", "and", "Queen"]',
+          numbers: '[2, 42, 3]',
+          vectors: '[0.92, 0.96, 0.80...]',
+          meaning: 'cos(King, Queen) = 0.98'
+        },
+        {
+          text: '"Apple or Orange"',
+          tokens: '["Apple", "or", "Orange"]',
+          numbers: '[6, 57, 7]',
+          vectors: '[0.06, 0.42, 0.96...]',
+          meaning: 'cos(Apple, Orange) = 0.99'
+        }
+      ];
+
+      let heroStageIdx = 0;
+      let heroExampleIdx = 0;
+
+      function updateHeroPipelineUI() {
+        const stages = document.querySelectorAll('#hero-pipeline .pipeline-stage');
+        stages.forEach((el, idx) => {
+          el.classList.toggle('active-stage', idx === heroStageIdx);
+        });
+        const ex = HERO_EXAMPLES[heroExampleIdx];
+        document.getElementById('hero-demo-0').textContent = ex.text;
+        document.getElementById('hero-demo-1').textContent = ex.tokens;
+        document.getElementById('hero-demo-2').textContent = ex.numbers;
+        document.getElementById('hero-demo-3').textContent = ex.vectors;
+        document.getElementById('hero-demo-4').textContent = ex.meaning;
+      }
+
+      document.querySelectorAll('#hero-pipeline .pipeline-stage').forEach(stageEl => {
+        stageEl.addEventListener('click', () => {
+          heroStageIdx = Number(stageEl.getAttribute('data-stage')) || 0;
+          updateHeroPipelineUI();
+        });
+      });
+
+      setInterval(() => {
+        heroStageIdx = (heroStageIdx + 1) % 5;
+        if (heroStageIdx === 0) {
+          heroExampleIdx = (heroExampleIdx + 1) % HERO_EXAMPLES.length;
+        }
+        updateHeroPipelineUI();
+      }, 2600);
+
+      /* ---------------------------------------------------------
+         5. SECTION 3: TOKENIZATION PLAYGROUND
+      --------------------------------------------------------- */
+      let currentTokenizerMode = 'word';
+
+      const MODE_EXPLANATIONS = {
+        word: '<strong>Word-level Tokenization (Educational Approximation):</strong> Splits input text along whitespace boundaries while separating punctuation marks into their own tokens. Simple and intuitive, though every new word inflection requires a separate vocabulary entry.',
+        subword: '<strong>Subword-level Tokenization (Educational BPE-style Approximation):</strong> Keeps frequent short words whole, while decomposing longer or inflected words into reusable prefixes, roots, and suffixes (marked with <code>##</code>, such as <code>chang</code> + <code>##ing</code> or <code>intellig</code> + <code>##ence</code>). This lets models handle rare words gracefully.',
+        char: '<strong>Character-level Tokenization (Educational Approximation):</strong> Breaks text into individual characters (including spaces shown as <code>⎵</code>). Requires a very tiny vocabulary of letters and symbols, but produces much longer token sequences.'
+      };
+
+      function tokenizeEducational(rawText, mode) {
+        const trimmed = rawText || '';
+        if (!trimmed.trim()) return [];
+
+        const results = [];
+
+        if (mode === 'char') {
+          for (let i = 0; i < trimmed.length; i++) {
+            const ch = trimmed[i];
+            const displayStr = ch === ' ' ? '⎵' : ch;
+            let typeClass = 'tok-type-char';
+            let typeLabel = 'char';
+            if (/[0-9]/.test(ch)) {
+              typeClass = 'tok-type-number';
+              typeLabel = 'number';
+            } else if (/[^\w\s]/.test(ch)) {
+              typeClass = 'tok-type-punctuation';
+              typeLabel = 'punctuation';
+            }
+            const vocabEntry = getOrRegisterToken(displayStr, typeLabel);
+            results.push({
+              text: displayStr,
+              id: vocabEntry.id,
+              typeClass,
+              typeLabel: typeLabel.toUpperCase()
+            });
+          }
+          return results;
+        }
+
+        // Split into words, numbers, and punctuation tokens first
+        const matches = trimmed.match(/[A-Za-z]+|[0-9]+|[^\sA-Za-z0-9]/g) || [];
+
+        if (mode === 'word') {
+          matches.forEach(piece => {
+            let typeClass = 'tok-type-word';
+            let typeLabel = 'word';
+            if (/^[0-9]+$/.test(piece)) {
+              typeClass = 'tok-type-number';
+              typeLabel = 'number';
+            } else if (/^[^\w\s]+$/.test(piece)) {
+              typeClass = 'tok-type-punctuation';
+              typeLabel = 'punctuation';
+            }
+            const vocabEntry = getOrRegisterToken(piece, typeLabel);
+            results.push({
+              text: piece,
+              id: vocabEntry.id,
+              typeClass,
+              typeLabel: typeLabel.toUpperCase()
+            });
+          });
+          return results;
+        }
+
+        // Subword-level (Educational BPE-style approximation)
+        const prefixes = ['un', 're', 'pre', 'inter', 'hyper', 'trans', 'auto'];
+        const suffixes = ['ing', 'tion', 'ence', 'able', 'ment', 'ness', 'ed', 'ly', 'er', 'est', 'al', 'ic'];
+
+        matches.forEach(piece => {
+          if (/^[0-9]+$/.test(piece)) {
+            const vocabEntry = getOrRegisterToken(piece, 'number');
+            results.push({ text: piece, id: vocabEntry.id, typeClass: 'tok-type-number', typeLabel: 'NUMBER' });
+            return;
+          }
+          if (/^[^\w\s]+$/.test(piece)) {
+            const vocabEntry = getOrRegisterToken(piece, 'punctuation');
+            results.push({ text: piece, id: vocabEntry.id, typeClass: 'tok-type-punctuation', typeLabel: 'PUNCT' });
+            return;
+          }
+
+          const lower = piece.toLowerCase();
+          // Keep short words or direct core vocabulary words intact if <= 5 chars
+          if (piece.length <= 5) {
+            const vocabEntry = getOrRegisterToken(piece, 'word');
+            results.push({ text: piece, id: vocabEntry.id, typeClass: 'tok-type-word', typeLabel: 'WORD' });
+            return;
+          }
+
+          let working = piece;
+          let workingLower = lower;
+          const subPieces = [];
+
+          // Check prefix
+          for (const pre of prefixes) {
+            if (workingLower.startsWith(pre) && working.length - pre.length >= 3) {
+              const pStr = working.slice(0, pre.length) + '##';
+              subPieces.push({ str: pStr, cls: 'tok-type-subword-affix', lbl: 'PREFIX' });
+              working = working.slice(pre.length);
+              workingLower = working.toLowerCase();
+              break;
+            }
+          }
+
+          // Check suffix
+          let matchedSuffix = null;
+          for (const suf of suffixes) {
+            if (workingLower.endsWith(suf) && working.length - suf.length >= 3) {
+              matchedSuffix = '##' + working.slice(working.length - suf.length);
+              working = working.slice(0, working.length - suf.length);
+              break;
+            }
+          }
+
+          if (subPieces.length > 0 || matchedSuffix) {
+            subPieces.push({ str: working, cls: 'tok-type-subword-root', lbl: 'ROOT' });
+            if (matchedSuffix) {
+              subPieces.push({ str: matchedSuffix, cls: 'tok-type-subword-affix', lbl: 'SUFFIX' });
+            }
+            subPieces.forEach(sp => {
+              const vEntry = getOrRegisterToken(sp.str, 'subword');
+              results.push({ text: sp.str, id: vEntry.id, typeClass: sp.cls, typeLabel: sp.lbl });
+            });
+          } else {
+            const vEntry = getOrRegisterToken(piece, 'word');
+            results.push({ text: piece, id: vEntry.id, typeClass: 'tok-type-word', typeLabel: 'WORD' });
+          }
+        });
+
+        return results;
+      }
+
+      function renderTokenizationPlayground() {
+        const inputEl = document.getElementById('tokenizer-input');
+        const rawText = inputEl.value;
+        const expBox = document.getElementById('tokenizer-mode-explanation');
+        expBox.innerHTML = MODE_EXPLANATIONS[currentTokenizerMode];
+
+        const tokens = tokenizeEducational(rawText, currentTokenizerMode);
+        const streamEl = document.getElementById('token-stream-container');
+        streamEl.innerHTML = '';
+
+        if (tokens.length === 0) {
+          streamEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.88rem;">Enter a sentence above to see colored token blocks and their assigned Token IDs.</div>';
+          document.getElementById('tok-stat-chars').textContent = '0 chars';
+          document.getElementById('tok-stat-count').textContent = '0';
+          document.getElementById('tok-stat-ids').textContent = '[]';
+          document.getElementById('tok-stat-ratio').textContent = '0.0';
+          document.getElementById('tok-array-output').textContent = '[]';
+          document.getElementById('tok-id-array-output').textContent = '[]';
+          return;
+        }
+
+        tokens.forEach(tok => {
+          const pill = document.createElement('div');
+          pill.className = `token-pill ${tok.typeClass}`;
+          pill.title = `Click to highlight Token "${tok.text}" (ID #${tok.id}) in Vocabulary`;
+          pill.innerHTML = `
+            <span class="tok-str">${escapeHtml(tok.text)}</span>
+            <span class="tok-meta">ID:${tok.id} • ${tok.typeLabel}</span>
+          `;
+          pill.addEventListener('click', () => {
+            selectVocabularyTokenById(tok.id, true);
+          });
+          streamEl.appendChild(pill);
+        });
+
+        const charLen = rawText.length;
+        const ratio = (charLen / tokens.length).toFixed(1);
+        const idsArray = tokens.map(t => t.id);
+        const strArray = tokens.map(t => `"${t.text}"`);
+
+        document.getElementById('tok-stat-chars').textContent = `${charLen} chars`;
+        document.getElementById('tok-stat-raw-preview').textContent = rawText.length > 28 ? rawText.slice(0, 28) + '...' : rawText;
+        document.getElementById('tok-stat-count').textContent = String(tokens.length);
+        document.getElementById('tok-stat-ids').textContent = `[${idsArray.slice(0, 6).join(', ')}${idsArray.length > 6 ? '...' : ''}]`;
+        document.getElementById('tok-stat-ratio').textContent = ratio;
+        document.getElementById('tok-array-output').textContent = `[${strArray.join(', ')}]`;
+        document.getElementById('tok-id-array-output').textContent = `[${idsArray.join(', ')}]`;
+
+        // Sync vocabulary table with any newly tokenized words
+        renderVocabularyTable();
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      document.querySelectorAll('#tokenizer-mode-tabs .mode-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#tokenizer-mode-tabs .mode-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentTokenizerMode = btn.getAttribute('data-mode');
+          renderTokenizationPlayground();
+        });
+      });
+
+      document.getElementById('tokenizer-input').addEventListener('input', renderTokenizationPlayground);
+      document.getElementById('tokenize-btn').addEventListener('click', renderTokenizationPlayground);
+
+      document.querySelectorAll('.tok-sample').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.getElementById('tokenizer-input').value = chip.getAttribute('data-text');
+          renderTokenizationPlayground();
+        });
+      });
+
+      /* ---------------------------------------------------------
+         6. SECTION 4: VOCABULARY EXPLORER & VISUAL MAPPING
+      --------------------------------------------------------- */
+      let selectedVocabId = 37; // Default 'AI' -> 37
+
+      function renderVocabVisualMapping(phrase) {
+        const container = document.getElementById('vocab-visual-mapper');
+        const words = (phrase || 'I love AI').trim().split(/\s+/).slice(0, 3);
+        container.innerHTML = '';
+
+        words.forEach(w => {
+          const entry = getOrRegisterToken(w, 'word');
+          const col = document.createElement('div');
+          col.className = 'mapping-column';
+          col.innerHTML = `
+            <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">Input Token</div>
+            <div class="mapping-node" style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.5);color:#ddd6fe;">"${escapeHtml(entry.token)}"</div>
+            <div class="mapping-arrow">↓ Vocabulary Lookup</div>
+            <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">Assigned Token ID</div>
+            <div class="mapping-node" style="background:rgba(6,182,212,0.2);border:1px solid rgba(6,182,212,0.5);color:var(--cyan-bright);font-size:1.1rem;">${entry.token} → ${entry.id}</div>
+          `;
+          col.addEventListener('click', () => selectVocabularyTokenById(entry.id, false));
+          container.appendChild(col);
+        });
+      }
+
+      document.querySelectorAll('.vocab-demo-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.vocab-demo-preset').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderVocabVisualMapping(btn.getAttribute('data-phrase'));
+        });
+      });
+
+      function selectVocabularyTokenById(id, scrollIntoView) {
+        selectedVocabId = id;
+        const found = vocabularyList.find(v => v.id === id);
+        if (found) {
+          document.getElementById('vocab-sel-token').textContent = `"${found.token}"`;
+          document.getElementById('vocab-sel-id').textContent = String(found.id);
+          document.getElementById('vocab-sel-type').textContent = found.type;
+        }
+        renderVocabularyTable();
+        if (scrollIntoView) {
+          document.getElementById('vocabulary').scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+
+      function renderVocabularyTable() {
+        const searchVal = (document.getElementById('vocab-search-input').value || '').trim().toLowerCase();
+        const typeFilter = document.getElementById('vocab-type-filter').value;
+        const sortMode = document.getElementById('vocab-sort-select').value;
+
+        let filtered = vocabularyList.filter(item => {
+          if (typeFilter !== 'all' && item.type !== typeFilter) return false;
+          if (searchVal) {
+            const matchToken = item.token.toLowerCase().includes(searchVal);
+            const matchId = String(item.id) === searchVal;
+            return matchToken || matchId;
+          }
+          return true;
+        });
+
+        filtered.sort((a, b) => {
+          if (sortMode === 'id-asc') return a.id - b.id;
+          if (sortMode === 'id-desc') return b.id - a.id;
+          if (sortMode === 'alpha-asc') return a.token.localeCompare(b.token);
+          if (sortMode === 'type') return a.type.localeCompare(b.type) || a.id - b.id;
+          return a.id - b.id;
+        });
+
+        const tbody = document.getElementById('vocab-table-body');
+        tbody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px;">No matching tokens found in vocabulary.</td></tr>';
+          return;
+        }
+
+        filtered.forEach(item => {
+          const tr = document.createElement('tr');
+          if (item.id === selectedVocabId) tr.className = 'selected-row';
+          const hasEmb = EMBEDDING_BY_LOWER.has(item.token.toLowerCase());
+          const catColor = CATEGORY_COLORS[item.category] || '#94a3b8';
+
+          tr.innerHTML = `
+            <td class="font-mono" style="color:var(--cyan-bright);font-weight:600;">#${item.id}</td>
+            <td class="font-mono" style="font-weight:600;color:#fff;">${escapeHtml(item.token)}</td>
+            <td><span style="padding:3px 9px;border-radius:999px;background:rgba(148,163,184,0.12);font-size:0.75rem;">${item.type}</span></td>
+            <td><span style="color:${catColor};font-size:0.8rem;">● ${item.category}</span></td>
+            <td>${hasEmb ? '<span style="color:var(--emerald);font-size:0.8rem;">✓ 8D & 3D Vector</span>' : '<span style="color:var(--text-dim);font-size:0.78rem;">Token ID Only</span>'}</td>
+          `;
+          tr.addEventListener('click', () => {
+            selectVocabularyTokenById(item.id, false);
+            if (hasEmb) {
+              selectEmbeddingWord(EMBEDDING_BY_LOWER.get(item.token.toLowerCase()).word);
+            }
+          });
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById('vocab-search-input').addEventListener('input', renderVocabularyTable);
+      document.getElementById('vocab-type-filter').addEventListener('change', renderVocabularyTable);
+      document.getElementById('vocab-sort-select').addEventListener('change', renderVocabularyTable);
+
+      /* ---------------------------------------------------------
+         7. SECTION 5: WORD EMBEDDINGS INSPECTOR
+      --------------------------------------------------------- */
+      let selectedEmbeddingWord = 'King';
+      let currentEmbeddingView = '3d'; // '3d' | '2d' | 'full'
+
+      function renderEmbeddingWordSelector() {
+        const grid = document.getElementById('embedding-word-grid');
+        grid.innerHTML = '';
+
+        // Show the 12 core words first, plus 6 extra popular words
+        const displayItems = [
+          ...EMBEDDING_DATASET.filter(d => d.featured),
+          ...EMBEDDING_DATASET.filter(d => !d.featured).slice(0, 6)
+        ];
+
+        displayItems.forEach(item => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'word-card-btn' + (item.word === selectedEmbeddingWord ? ' active' : '');
+          const color = CATEGORY_COLORS[item.category] || '#a855f7';
+          btn.innerHTML = `
+            <span class="word-card-name">${item.word}</span>
+            <span class="word-card-cat" style="color:${color};">${item.category} • #${item.id}</span>
+          `;
+          btn.addEventListener('click', () => {
+            selectEmbeddingWord(item.word);
+          });
+          grid.appendChild(btn);
+        });
+      }
+
+      function selectEmbeddingWord(wordStr) {
+        const item = EMBEDDING_BY_LOWER.get(wordStr.toLowerCase());
+        if (!item) return;
+        selectedEmbeddingWord = item.word;
+        renderEmbeddingWordSelector();
+        renderEmbeddingDetails();
+      }
+
+      function renderEmbeddingDetails() {
+        const item = EMBEDDING_BY_LOWER.get(selectedEmbeddingWord.toLowerCase()) || EMBEDDING_DATASET[0];
+        document.getElementById('emb-pipe-word').textContent = item.word;
+        document.getElementById('emb-pipe-id').textContent = `#${item.id}`;
+        document.getElementById('emb-rel-word-name').textContent = item.word;
+
+        const barsContainer = document.getElementById('emb-vector-bars-container');
+        const canvas2d = document.getElementById('emb-2d-canvas');
+
+        if (currentEmbeddingView === '3d') {
+          barsContainer.style.display = 'block';
+          canvas2d.style.display = 'none';
+          document.getElementById('emb-pipe-vec-label').textContent = '3. Embedding Vector (3D Coordinates)';
+          document.getElementById('emb-pipe-vec').textContent = `[${item.xyz.map(n => n.toFixed(2)).join(', ')}]`;
+          document.getElementById('emb-detail-heading').textContent = '3D Coordinate Projection (X, Y, Z)';
+          document.getElementById('emb-dim-badge').textContent = 'Dimensions: 3';
+
+          const labels = ['X Axis (Social/Bio vs Mech)', 'Y Axis (Status/Organic vs Mobile)', 'Z Axis (Nature/Food vs Tech)'];
+          barsContainer.innerHTML = item.xyz.map((val, idx) => {
+            const pct = Math.min(100, Math.max(5, ((val + 1) / 2) * 100));
+            return `
+              <div class="dim-bar-row">
+                <span style="color:var(--text-secondary);">${labels[idx]}</span>
+                <div class="dim-bar-track"><div class="dim-bar-fill" style="width:${pct}%;"></div></div>
+                <span class="font-mono" style="text-align:right;color:var(--cyan-bright);">${val.toFixed(2)}</span>
+              </div>
+            `;
+          }).join('') + `
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-top:12px;">
+              ${item.desc}
+            </p>
+          `;
+        } else if (currentEmbeddingView === '2d') {
+          barsContainer.style.display = 'none';
+          canvas2d.style.display = 'block';
+          document.getElementById('emb-pipe-vec-label').textContent = '3. Embedding Vector (2D Projection)';
+          document.getElementById('emb-pipe-vec').textContent = `[${item.xyz[0].toFixed(2)}, ${item.xyz[1].toFixed(2)}]`;
+          document.getElementById('emb-detail-heading').textContent = '2D Scatter Projection (X vs Y)';
+          document.getElementById('emb-dim-badge').textContent = 'Dimensions: 2';
+          draw2DProjectionCanvas(item);
+        } else {
+          barsContainer.style.display = 'block';
+          canvas2d.style.display = 'none';
+          document.getElementById('emb-pipe-vec-label').textContent = '3. Full Illustrative Embedding Vector (8D)';
+          document.getElementById('emb-pipe-vec').textContent = `[${item.vec8.map(n => n.toFixed(2)).join(', ')}]`;
+          document.getElementById('emb-detail-heading').textContent = 'Full 8-Dimensional Semantic Feature Vector';
+          document.getElementById('emb-dim-badge').textContent = 'Dimensions: 8';
+
+          barsContainer.innerHTML = item.vec8.map((val, idx) => {
+            const pct = Math.min(100, Math.max(4, Math.abs(val) * 100));
+            return `
+              <div class="dim-bar-row">
+                <span style="color:var(--text-secondary);">${DIMENSION_NAMES[idx]}</span>
+                <div class="dim-bar-track"><div class="dim-bar-fill" style="width:${pct}%;"></div></div>
+                <span class="font-mono" style="text-align:right;color:var(--cyan-bright);">${val.toFixed(2)}</span>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Render top 5 related words
+        const neighbors = getTopNeighborsForWord(item.word, 5);
+        const relContainer = document.getElementById('emb-related-list');
+        relContainer.innerHTML = neighbors.map(n => {
+          const pct = Math.max(0, Math.round(n.similarity * 100));
+          const col = CATEGORY_COLORS[n.category] || '#a855f7';
+          return `
+            <div style="display:grid;grid-template-columns:100px 1fr 58px;align-items:center;gap:10px;background:rgba(15,23,42,0.65);padding:8px 12px;border-radius:8px;cursor:pointer;" data-rel-word="${n.word}">
+              <span style="font-weight:600;color:#fff;"><span style="color:${col};">●</span> ${n.word}</span>
+              <div class="sim-bar-bg"><div class="sim-bar-fill" style="width:${pct}%;"></div></div>
+              <span class="font-mono" style="font-size:0.8rem;color:var(--cyan-bright);text-align:right;">${n.similarity.toFixed(3)}</span>
+            </div>
+          `;
+        }).join('');
+
+        relContainer.querySelectorAll('[data-rel-word]').forEach(row => {
+          row.addEventListener('click', () => {
+            selectEmbeddingWord(row.getAttribute('data-rel-word'));
+          });
+        });
+      }
+
+      function draw2DProjectionCanvas(selectedItem) {
+        const canvas = document.getElementById('emb-2d-canvas');
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // Grid axes
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w, h / 2);
+        ctx.moveTo(w / 2, 0);
+        ctx.lineTo(w / 2, h);
+        ctx.stroke();
+
+        EMBEDDING_DATASET.forEach(item => {
+          const px = w / 2 + item.xyz[0] * (w * 0.38);
+          const py = h / 2 - item.xyz[1] * (h * 0.38);
+          const isSel = item.word === selectedItem.word;
+          ctx.beginPath();
+          ctx.arc(px, py, isSel ? 7 : 4, 0, Math.PI * 2);
+          ctx.fillStyle = CATEGORY_COLORS[item.category] || '#a855f7';
+          ctx.fill();
+          if (isSel) {
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+          if (isSel || item.featured) {
+            ctx.fillStyle = isSel ? '#ffffff' : '#94a3b8';
+            ctx.font = isSel ? 'bold 12px Inter, sans-serif' : '10px Inter, sans-serif';
+            ctx.fillText(item.word, px + 8, py + 4);
+          }
+        });
+      }
+
+      document.querySelectorAll('#embedding-view-tabs .mode-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#embedding-view-tabs .mode-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentEmbeddingView = btn.getAttribute('data-view');
+          renderEmbeddingDetails();
+        });
+      });
+
+      document.getElementById('emb-jump-3d-btn').addEventListener('click', () => {
+        focusWordIn3DSpace(selectedEmbeddingWord, true);
+      });
+
+      /* ---------------------------------------------------------
+         8. SECTION 6: INTERACTIVE 3D EMBEDDING SPACE
+         Supports Three.js WebGL AND a seamless high-precision
+         3D projection engine so it works in 100% of browsers/environments
+      --------------------------------------------------------- */
+      const activeCategories = new Set(Object.keys(CATEGORY_COLORS));
+      let show3DLabels = true;
+      let showNeighborLines = true;
+      let selected3DWord = 'King';
+      let highlightedSet3D = new Set(); // For pair or sentence highlights
+
+      // Camera spherical coordinates
+      let camTheta = 0.62;
+      let camPhi = 1.12;
+      let camRadius = 3.25;
+      let camPanX = 0;
+      let camPanY = 0;
+      let targetTheta = 0.62;
+      let targetPhi = 1.12;
+      let targetRadius = 3.25;
+      let targetPanX = 0;
+      let targetPanY = 0;
+
+      function renderCategoryLegend() {
+        const legendEl = document.getElementById('space-category-legend');
+        legendEl.innerHTML = '';
+        Object.entries(CATEGORY_COLORS).forEach(([cat, color]) => {
+          const item = document.createElement('div');
+          item.className = 'legend-item' + (activeCategories.has(cat) ? '' : ' inactive');
+          item.innerHTML = `<span class="legend-dot" style="background:${color};box-shadow:0 0 8px ${color};"></span><span>${cat}</span>`;
+          item.addEventListener('click', () => {
+            if (activeCategories.has(cat)) {
+              if (activeCategories.size > 1) activeCategories.delete(cat);
+            } else {
+              activeCategories.add(cat);
+            }
+            renderCategoryLegend();
+            request3DRender();
+          });
+          legendEl.appendChild(item);
+        });
+      }
+
+      function update3DSidePanel(wordStr) {
+        const item = EMBEDDING_BY_LOWER.get(wordStr.toLowerCase()) || EMBEDDING_DATASET[0];
+        selected3DWord = item.word;
+        const catColor = CATEGORY_COLORS[item.category] || '#a855f7';
+
+        const catEl = document.getElementById('space-info-cat');
+        catEl.textContent = item.category.toUpperCase();
+        catEl.style.color = catColor;
+
+        document.getElementById('space-info-id').textContent = `Token ID #${item.id}`;
+        document.getElementById('space-info-word').textContent = item.word;
+        document.getElementById('space-info-desc').textContent = item.desc;
+        document.getElementById('space-coord-x').textContent = item.xyz[0].toFixed(2);
+        document.getElementById('space-coord-y').textContent = item.xyz[1].toFixed(2);
+        document.getElementById('space-coord-z').textContent = item.xyz[2].toFixed(2);
+        document.getElementById('space-xyz-readout').textContent =
+          `Selected: ${item.word} • XYZ: (${item.xyz[0].toFixed(2)}, ${item.xyz[1].toFixed(2)}, ${item.xyz[2].toFixed(2)})`;
+
+        const neighbors = getTopNeighborsForWord(item.word, 5);
+        const listEl = document.getElementById('space-neighbors-list');
+        listEl.innerHTML = neighbors.map(n => {
+          const col = CATEGORY_COLORS[n.category] || '#a855f7';
+          const pct = Math.max(0, Math.round(n.similarity * 100));
+          return `
+            <div style="display:grid;grid-template-columns:92px 1fr 54px;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:rgba(5,8,16,0.75);border:1px solid var(--border-subtle);cursor:pointer;" data-focus-word="${n.word}">
+              <span style="font-size:0.84rem;font-weight:600;color:#fff;"><span style="color:${col};">●</span> ${n.word}</span>
+              <div class="sim-bar-bg"><div class="sim-bar-fill" style="width:${pct}%;"></div></div>
+              <span class="font-mono" style="font-size:0.78rem;color:var(--cyan-bright);text-align:right;">${n.similarity.toFixed(3)}</span>
+            </div>
+          `;
+        }).join('');
+
+        listEl.querySelectorAll('[data-focus-word]').forEach(el => {
+          el.addEventListener('click', () => {
+            focusWordIn3DSpace(el.getAttribute('data-focus-word'), false);
+          });
+        });
+      }
+
+      function focusWordIn3DSpace(wordStr, scrollToSection) {
+        const item = EMBEDDING_BY_LOWER.get((wordStr || '').toLowerCase());
+        if (!item) return;
+        highlightedSet3D.clear();
+        activeCategories.add(item.category);
+        renderCategoryLegend();
+        update3DSidePanel(item.word);
+
+        // Smoothly orient camera toward the selected point
+        const [x, y, z] = item.xyz;
+        targetTheta = Math.atan2(x, z) + 0.35;
+        targetPhi = Math.max(0.45, Math.min(2.6, Math.acos(Math.max(-1, Math.min(1, y / 1.4)))));
+        targetPanX = x * 0.22;
+        targetPanY = y * 0.22;
+        request3DRender();
+
+        if (scrollToSection) {
+          document.getElementById('space-3d').scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+
+      function highlightMultipleWordsIn3DSpace(wordList, scrollToSection) {
+        highlightedSet3D.clear();
+        wordList.forEach(w => {
+          const found = EMBEDDING_BY_LOWER.get(w.toLowerCase());
+          if (found) {
+            highlightedSet3D.add(found.word);
+            activeCategories.add(found.category);
+          }
+        });
+        renderCategoryLegend();
+        if (wordList.length > 0) {
+          const first = EMBEDDING_BY_LOWER.get(wordList[0].toLowerCase());
+          if (first) update3DSidePanel(first.word);
+        }
+        request3DRender();
+        if (scrollToSection) {
+          document.getElementById('space-3d').scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+
+      // Interactive 3D Renderer: Uses Three.js WebGLRenderer when THREE is loaded from CDN,
+      // plus synchronized 2D HUD overlay for crisp typography & full fallback if offline.
+      const canvas3D = document.getElementById('embedding-3d-canvas');
+      const ctx3D = canvas3D.getContext('2d');
+      const webglCanvas = document.getElementById('three-webgl-canvas');
+      let projectedNodes = [];
+      let hoveredWord3D = null;
+      let animFrameRequested = false;
+
+      let threeState = null;
+
+      function initThreeJSIfAvailable() {
+        if (threeState || typeof window.THREE === 'undefined') {
+          if (typeof window.THREE === 'undefined') {
+            const badge = document.getElementById('space-engine-badge');
+            if (badge) {
+              badge.textContent = '3D Canvas Engine Active (Offline Fallback) • Drag to Rotate • Scroll to Zoom';
+            }
+          }
+          return;
+        }
+        try {
+          const THREE = window.THREE;
+          const renderer = new THREE.WebGLRenderer({
+            canvas: webglCanvas,
+            antialias: true,
+            alpha: true
+          });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          webglCanvas.style.display = 'block';
+
+          const scene = new THREE.Scene();
+          const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+
+          // Lights
+          const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+          scene.add(ambientLight);
+          const pointLight1 = new THREE.PointLight(0xa855f7, 1.6, 15);
+          pointLight1.position.set(3, 4, 3);
+          scene.add(pointLight1);
+          const pointLight2 = new THREE.PointLight(0x22d3ee, 1.4, 15);
+          pointLight2.position.set(-3, -2, 4);
+          scene.add(pointLight2);
+
+          // Subtle Grid & Axes
+          const gridHelper = new THREE.GridHelper(2.4, 8, 0x8b5cf6, 0x1e293b);
+          gridHelper.position.y = -1.0;
+          gridHelper.material.opacity = 0.32;
+          gridHelper.material.transparent = true;
+          scene.add(gridHelper);
+
+          const axesGroup = new THREE.Group();
+          const makeAxis = (from, to, hex) => {
+            const geom = new THREE.BufferGeometry().setFromPoints([
+              new THREE.Vector3(...from),
+              new THREE.Vector3(...to)
+            ]);
+            const mat = new THREE.LineBasicMaterial({ color: hex, transparent: true, opacity: 0.45 });
+            return new THREE.Line(geom, mat);
+          };
+          axesGroup.add(makeAxis([-1.15, 0, 0], [1.15, 0, 0], 0xa855f7));
+          axesGroup.add(makeAxis([0, -1.15, 0], [0, 1.15, 0], 0x06b6d4));
+          axesGroup.add(makeAxis([0, 0, -1.15], [0, 0, 1.15], 0x10b981));
+          scene.add(axesGroup);
+
+          // Word Spheres
+          const sphereGeom = new THREE.SphereGeometry(0.055, 24, 24);
+          const meshesByWord = new Map();
+          EMBEDDING_DATASET.forEach(item => {
+            const colHex = CATEGORY_COLORS[item.category] || '#a855f7';
+            const mat = new THREE.MeshStandardMaterial({
+              color: new THREE.Color(colHex),
+              emissive: new THREE.Color(colHex),
+              emissiveIntensity: 0.45,
+              roughness: 0.25,
+              metalness: 0.2
+            });
+            const mesh = new THREE.Mesh(sphereGeom, mat);
+            mesh.position.set(item.xyz[0], item.xyz[1], item.xyz[2]);
+            scene.add(mesh);
+            meshesByWord.set(item.word, mesh);
+          });
+
+          const linesGroup = new THREE.Group();
+          scene.add(linesGroup);
+
+          threeState = { THREE, renderer, scene, camera, meshesByWord, linesGroup };
+          const badge = document.getElementById('space-engine-badge');
+          if (badge) {
+            badge.textContent = 'Three.js WebGL Engine Active • Drag to Rotate • Scroll to Zoom • Shift+Drag to Pan';
+          }
+        } catch (err) {
+          threeState = null;
+        }
+      }
+
+      function resize3DCanvas() {
+        const wrapper = document.getElementById('canvas-3d-wrapper');
+        if (!wrapper) return;
+        const rect = wrapper.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas3D.width = Math.max(300, Math.floor(rect.width * dpr));
+        canvas3D.height = Math.max(300, Math.floor(rect.height * dpr));
+        ctx3D.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        initThreeJSIfAvailable();
+        if (threeState) {
+          threeState.renderer.setSize(rect.width, rect.height, false);
+          threeState.camera.aspect = rect.width / Math.max(1, rect.height);
+          threeState.camera.updateProjectionMatrix();
+        }
+        request3DRender();
+      }
+
+      function project3DPoint(x, y, z, width, height) {
+        // Rotate around Y by camTheta, then X by (camPhi - PI/2)
+        const cosT = Math.cos(camTheta);
+        const sinT = Math.sin(camTheta);
+        const pitch = camPhi - Math.PI / 2;
+        const cosP = Math.cos(pitch);
+        const sinP = Math.sin(pitch);
+
+        const rx = (x - camPanX) * cosT - z * sinT;
+        const rz1 = (x - camPanX) * sinT + z * cosT;
+        const ry = (y - camPanY) * cosP - rz1 * sinP;
+        const rz = (y - camPanY) * sinP + rz1 * cosP;
+
+        const fov = Math.min(width, height) * 0.88;
+        const dist = camRadius + rz;
+        if (dist <= 0.2) return null;
+        const scale = fov / dist;
+        return {
+          sx: width / 2 + rx * scale,
+          sy: height / 2 - ry * scale,
+          depth: dist,
+          scale
+        };
+      }
+
+      function request3DRender() {
+        if (!animFrameRequested) {
+          animFrameRequested = true;
+          requestAnimationFrame(render3DFrame);
+        }
+      }
+
+      function render3DFrame() {
+        animFrameRequested = false;
+        const wrapper = document.getElementById('canvas-3d-wrapper');
+        if (!wrapper) return;
+        const width = wrapper.clientWidth;
+        const height = wrapper.clientHeight;
+
+        // Smooth camera damping
+        const dTheta = targetTheta - camTheta;
+        const dPhi = targetPhi - camPhi;
+        const dRad = targetRadius - camRadius;
+        const dPx = targetPanX - camPanX;
+        const dPy = targetPanY - camPanY;
+
+        const needsMore =
+          Math.abs(dTheta) > 0.001 ||
+          Math.abs(dPhi) > 0.001 ||
+          Math.abs(dRad) > 0.001 ||
+          Math.abs(dPx) > 0.001 ||
+          Math.abs(dPy) > 0.001;
+
+        camTheta += dTheta * 0.18;
+        camPhi += dPhi * 0.18;
+        camRadius += dRad * 0.18;
+        camPanX += dPx * 0.18;
+        camPanY += dPy * 0.18;
+
+        initThreeJSIfAvailable();
+        if (threeState) {
+          const { THREE, renderer, scene, camera, meshesByWord, linesGroup } = threeState;
+          const pitch = camPhi - Math.PI / 2;
+          const cx = camPanX + camRadius * Math.sin(camTheta) * Math.cos(pitch);
+          const cy = camPanY + camRadius * Math.sin(pitch);
+          const cz = camRadius * Math.cos(camTheta) * Math.cos(pitch);
+          camera.position.set(cx, cy, cz);
+          camera.lookAt(camPanX, camPanY, 0);
+
+          EMBEDDING_DATASET.forEach(item => {
+            const mesh = meshesByWord.get(item.word);
+            if (!mesh) return;
+            mesh.visible = activeCategories.has(item.category);
+            const isSel = item.word === selected3DWord;
+            const isHi = highlightedSet3D.has(item.word);
+            const s = isSel ? 1.55 : (isHi ? 1.35 : 1.0);
+            mesh.scale.set(s, s, s);
+          });
+
+          // Rebuild neighbor lines in Three.js scene
+          while (linesGroup.children.length > 0) {
+            const child = linesGroup.children[0];
+            if (child.geometry) child.geometry.dispose();
+            linesGroup.remove(child);
+          }
+          if (showNeighborLines) {
+            const selItem = EMBEDDING_BY_LOWER.get(selected3DWord.toLowerCase());
+            if (selItem && activeCategories.has(selItem.category)) {
+              const neighbors = getTopNeighborsForWord(selected3DWord, 5);
+              neighbors.forEach(nb => {
+                if (!activeCategories.has(nb.category)) return;
+                const geom = new THREE.BufferGeometry().setFromPoints([
+                  new THREE.Vector3(...selItem.xyz),
+                  new THREE.Vector3(...nb.xyz)
+                ]);
+                const mat = new THREE.LineBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.65 });
+                linesGroup.add(new THREE.Line(geom, mat));
+              });
+            }
+          }
+          renderer.render(scene, camera);
+        }
+
+        ctx3D.clearRect(0, 0, width, height);
+
+        // 1. Draw Subtle 3D Grid Floor (y = -1.0) & 3D Holodeck Bounding Cube
+        ctx3D.strokeStyle = 'rgba(0, 245, 212, 0.11)';
+        ctx3D.lineWidth = 1;
+        for (let g = -1.2; g <= 1.21; g += 0.4) {
+          const p1 = project3DPoint(g, -1.0, -1.2, width, height);
+          const p2 = project3DPoint(g, -1.0, 1.2, width, height);
+          if (p1 && p2) {
+            ctx3D.beginPath();
+            ctx3D.moveTo(p1.sx, p1.sy);
+            ctx3D.lineTo(p2.sx, p2.sy);
+            ctx3D.stroke();
+          }
+          const p3 = project3DPoint(-1.2, -1.0, g, width, height);
+          const p4 = project3DPoint(1.2, -1.0, g, width, height);
+          if (p3 && p4) {
+            ctx3D.beginPath();
+            ctx3D.moveTo(p3.sx, p3.sy);
+            ctx3D.lineTo(p4.sx, p4.sy);
+            ctx3D.stroke();
+          }
+        }
+
+        // Draw 3D Wireframe Bounding Cube Edges
+        const cubeCorners = [
+          [-1.2, -1.0, -1.2], [1.2, -1.0, -1.2], [1.2, 1.0, -1.2], [-1.2, 1.0, -1.2],
+          [-1.2, -1.0, 1.2],  [1.2, -1.0, 1.2],  [1.2, 1.0, 1.2],  [-1.2, 1.0, 1.2]
+        ];
+        const cubeEdges = [
+          [0,1],[1,2],[2,3],[3,0],
+          [4,5],[5,6],[6,7],[7,4],
+          [0,4],[1,5],[2,6],[3,7]
+        ];
+        ctx3D.strokeStyle = 'rgba(251, 191, 36, 0.14)';
+        ctx3D.lineWidth = 1;
+        cubeEdges.forEach(([i, j]) => {
+          const a = project3DPoint(cubeCorners[i][0], cubeCorners[i][1], cubeCorners[i][2], width, height);
+          const b = project3DPoint(cubeCorners[j][0], cubeCorners[j][1], cubeCorners[j][2], width, height);
+          if (a && b) {
+            ctx3D.beginPath();
+            ctx3D.moveTo(a.sx, a.sy);
+            ctx3D.lineTo(b.sx, b.sy);
+            ctx3D.stroke();
+          }
+        });
+
+        // 2. Draw Coordinate Axes (X, Y, Z) through origin
+        const axes = [
+          { from: [-1.15, 0, 0], to: [1.15, 0, 0], color: 'rgba(168, 85, 247, 0.4)', label: '+X' },
+          { from: [0, -1.15, 0], to: [0, 1.15, 0], color: 'rgba(6, 182, 212, 0.4)', label: '+Y' },
+          { from: [0, 0, -1.15], to: [0, 0, 1.15], color: 'rgba(16, 185, 129, 0.4)', label: '+Z' }
+        ];
+        axes.forEach(ax => {
+          const a = project3DPoint(ax.from[0], ax.from[1], ax.from[2], width, height);
+          const b = project3DPoint(ax.to[0], ax.to[1], ax.to[2], width, height);
+          if (a && b) {
+            ctx3D.strokeStyle = ax.color;
+            ctx3D.lineWidth = 1.5;
+            ctx3D.beginPath();
+            ctx3D.moveTo(a.sx, a.sy);
+            ctx3D.lineTo(b.sx, b.sy);
+            ctx3D.stroke();
+            ctx3D.fillStyle = ax.color;
+            ctx3D.font = '600 11px JetBrains Mono, monospace';
+            ctx3D.fillText(ax.label, b.sx + 4, b.sy - 4);
+          }
+        });
+
+        // 3. Project all visible words
+        const visibleNodes = [];
+        EMBEDDING_DATASET.forEach(item => {
+          if (!activeCategories.has(item.category)) return;
+          const proj = project3DPoint(item.xyz[0], item.xyz[1], item.xyz[2], width, height);
+          if (proj) {
+            visibleNodes.push({
+              item,
+              sx: proj.sx,
+              sy: proj.sy,
+              depth: proj.depth,
+              scale: proj.scale
+            });
+          }
+        });
+
+        // Sort back-to-front (painter's algorithm)
+        visibleNodes.sort((a, b) => b.depth - a.depth);
+        projectedNodes = visibleNodes;
+
+        // 4. Draw Connecting Lines between selected word and its top 5 neighbors
+        if (showNeighborLines) {
+          const selNode = visibleNodes.find(n => n.item.word === selected3DWord);
+          if (selNode) {
+            const neighbors = getTopNeighborsForWord(selected3DWord, 5);
+            neighbors.forEach(nb => {
+              const targetNode = visibleNodes.find(n => n.item.word === nb.word);
+              if (targetNode) {
+                const grad = ctx3D.createLinearGradient(selNode.sx, selNode.sy, targetNode.sx, targetNode.sy);
+                grad.addColorStop(0, 'rgba(34, 211, 238, 0.85)');
+                grad.addColorStop(1, 'rgba(168, 85, 247, 0.35)');
+                ctx3D.strokeStyle = grad;
+                ctx3D.lineWidth = 2;
+                ctx3D.beginPath();
+                ctx3D.moveTo(selNode.sx, selNode.sy);
+                ctx3D.lineTo(targetNode.sx, targetNode.sy);
+                ctx3D.stroke();
+
+                // Midpoint cosine similarity label
+                const mx = (selNode.sx + targetNode.sx) / 2;
+                const my = (selNode.sy + targetNode.sy) / 2;
+                ctx3D.fillStyle = 'rgba(7, 10, 20, 0.8)';
+                ctx3D.fillRect(mx - 18, my - 8, 36, 15);
+                ctx3D.fillStyle = '#22d3ee';
+                ctx3D.font = '500 10px JetBrains Mono, monospace';
+                ctx3D.fillText(nb.similarity.toFixed(2), mx - 14, my + 3);
+              }
+            });
+          }
+
+          // If multiple words are highlighted (e.g. from Closest Pairs or Sentence Experiment), connect them
+          if (highlightedSet3D.size >= 2) {
+            const hiNodes = visibleNodes.filter(n => highlightedSet3D.has(n.item.word));
+            for (let i = 0; i < hiNodes.length - 1; i++) {
+              ctx3D.strokeStyle = 'rgba(245, 158, 11, 0.85)';
+              ctx3D.lineWidth = 2.4;
+              ctx3D.setLineDash([5, 4]);
+              ctx3D.beginPath();
+              ctx3D.moveTo(hiNodes[i].sx, hiNodes[i].sy);
+              ctx3D.lineTo(hiNodes[i + 1].sx, hiNodes[i + 1].sy);
+              ctx3D.stroke();
+              ctx3D.setLineDash([]);
+            }
+          }
+        }
+
+        // 5. Draw Glowing 3D Spheres & Labels
+        const neighborWordsSet = new Set(getTopNeighborsForWord(selected3DWord, 5).map(n => n.word));
+
+        visibleNodes.forEach(node => {
+          const { item, sx, sy, scale } = node;
+          const isSelected = item.word === selected3DWord;
+          const isHovered = item.word === hoveredWord3D;
+          const isNeighbor = neighborWordsSet.has(item.word);
+          const isHighlighted = highlightedSet3D.has(item.word);
+          const color = CATEGORY_COLORS[item.category] || '#a855f7';
+
+          const baseR = Math.max(5, Math.min(16, scale * 0.042));
+          const radius = isSelected ? baseR * 1.45 : (isHovered || isHighlighted ? baseR * 1.25 : baseR);
+
+          // Outer glow
+          const glowRadius = radius * (isSelected || isHighlighted ? 2.8 : 2.0);
+          const glow = ctx3D.createRadialGradient(sx, sy, radius * 0.2, sx, sy, glowRadius);
+          glow.addColorStop(0, color);
+          glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx3D.fillStyle = glow;
+          ctx3D.beginPath();
+          ctx3D.arc(sx, sy, glowRadius, 0, Math.PI * 2);
+          ctx3D.fill();
+
+          // Sphere core with 3D specular highlight
+          const sphereGrad = ctx3D.createRadialGradient(sx - radius * 0.3, sy - radius * 0.3, radius * 0.1, sx, sy, radius);
+          sphereGrad.addColorStop(0, '#ffffff');
+          sphereGrad.addColorStop(0.35, color);
+          sphereGrad.addColorStop(1, '#090d16');
+          ctx3D.fillStyle = sphereGrad;
+          ctx3D.beginPath();
+          ctx3D.arc(sx, sy, radius, 0, Math.PI * 2);
+          ctx3D.fill();
+
+          if (isSelected || isHovered || isHighlighted) {
+            ctx3D.strokeStyle = isHighlighted ? '#f59e0b' : '#ffffff';
+            ctx3D.lineWidth = 2;
+            ctx3D.stroke();
+          }
+
+          // Word label
+          if (show3DLabels || isSelected || isHovered || isNeighbor || isHighlighted) {
+            ctx3D.font = (isSelected || isHighlighted)
+              ? '700 12.5px Space Grotesk, sans-serif'
+              : '500 11px Inter, sans-serif';
+            ctx3D.fillStyle = isSelected ? '#ffffff' : (isNeighbor ? '#a5f3fc' : 'rgba(241, 245, 249, 0.88)');
+            ctx3D.fillText(item.word, sx + radius + 5, sy + 4);
+          }
+        });
+
+        if (needsMore) {
+          request3DRender();
+        }
+      }
+
+      // Mouse & Touch Controls for 3D Canvas (Rotate, Zoom, Pan, Hover, Click)
+      let isDragging3D = false;
+      let isPanning3D = false;
+      let dragStartX = 0;
+      let dragStartY = 0;
+      let pointerMovedDist = 0;
+
+      canvas3D.addEventListener('mousedown', e => {
+        isDragging3D = true;
+        isPanning3D = e.button === 2 || e.shiftKey;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        pointerMovedDist = 0;
+      });
+
+      canvas3D.addEventListener('contextmenu', e => e.preventDefault());
+
+      window.addEventListener('mousemove', e => {
+        const rect = canvas3D.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        if (isDragging3D) {
+          const dx = e.clientX - dragStartX;
+          const dy = e.clientY - dragStartY;
+          pointerMovedDist += Math.abs(dx) + Math.abs(dy);
+          dragStartX = e.clientX;
+          dragStartY = e.clientY;
+
+          if (isPanning3D) {
+            targetPanX -= dx * 0.003;
+            targetPanY += dy * 0.003;
+          } else {
+            targetTheta -= dx * 0.007;
+            targetPhi = Math.max(0.25, Math.min(Math.PI - 0.25, targetPhi - dy * 0.007));
+          }
+          request3DRender();
+          return;
+        }
+
+        // Hover hit-testing inside canvas bounds
+        if (mx >= 0 && mx <= rect.width && my >= 0 && my <= rect.height) {
+          let hit = null;
+          for (let i = projectedNodes.length - 1; i >= 0; i--) {
+            const n = projectedNodes[i];
+            const dist = Math.hypot(mx - n.sx, my - n.sy);
+            if (dist < 16) {
+              hit = n;
+              break;
+            }
+          }
+          const tooltip = document.getElementById('tooltip-3d');
+          if (hit) {
+            hoveredWord3D = hit.item.word;
+            canvas3D.style.cursor = 'pointer';
+            tooltip.style.display = 'block';
+            tooltip.style.left = Math.min(rect.width - 190, mx + 14) + 'px';
+            tooltip.style.top = Math.max(10, my - 36) + 'px';
+            tooltip.innerHTML = `<strong>${hit.item.word}</strong> <span style="color:var(--cyan-bright);">(#${hit.item.id})</span><br/><span class="font-mono" style="font-size:0.72rem;color:var(--text-muted);">XYZ: ${hit.item.xyz.map(v => v.toFixed(2)).join(', ')}</span>`;
+            request3DRender();
+          } else if (hoveredWord3D !== null) {
+            hoveredWord3D = null;
+            canvas3D.style.cursor = 'grab';
+            tooltip.style.display = 'none';
+            request3DRender();
+          }
+        }
+      });
+
+      window.addEventListener('mouseup', e => {
+        if (!isDragging3D) return;
+        isDragging3D = false;
+        if (pointerMovedDist < 6) {
+          const rect = canvas3D.getBoundingClientRect();
+          const mx = e.clientX - rect.left;
+          const my = e.clientY - rect.top;
+          for (let i = projectedNodes.length - 1; i >= 0; i--) {
+            const n = projectedNodes[i];
+            if (Math.hypot(mx - n.sx, my - n.sy) < 18) {
+              highlightedSet3D.clear();
+              update3DSidePanel(n.item.word);
+              request3DRender();
+              break;
+            }
+          }
+        }
+      });
+
+      canvas3D.addEventListener('wheel', e => {
+        e.preventDefault();
+        targetRadius = Math.max(1.6, Math.min(6.0, targetRadius + e.deltaY * 0.0022));
+        request3DRender();
+      }, { passive: false });
+
+      // 3D Toolbar Buttons
+      document.getElementById('space-toggle-labels').addEventListener('click', function () {
+        show3DLabels = !show3DLabels;
+        this.textContent = `Labels: ${show3DLabels ? 'ON' : 'OFF'}`;
+        request3DRender();
+      });
+
+      document.getElementById('space-toggle-lines').addEventListener('click', function () {
+        showNeighborLines = !showNeighborLines;
+        this.textContent = `Neighbor Lines: ${showNeighborLines ? 'ON' : 'OFF'}`;
+        request3DRender();
+      });
+
+      document.getElementById('space-zoom-in').addEventListener('click', () => {
+        targetRadius = Math.max(1.6, targetRadius - 0.45);
+        request3DRender();
+      });
+
+      document.getElementById('space-zoom-out').addEventListener('click', () => {
+        targetRadius = Math.min(6.0, targetRadius + 0.45);
+        request3DRender();
+      });
+
+      document.getElementById('space-reset-cam').addEventListener('click', () => {
+        targetTheta = 0.62;
+        targetPhi = 1.12;
+        targetRadius = 3.25;
+        targetPanX = 0;
+        targetPanY = 0;
+        highlightedSet3D.clear();
+        activeCategories.clear();
+        Object.keys(CATEGORY_COLORS).forEach(c => activeCategories.add(c));
+        renderCategoryLegend();
+        request3DRender();
+      });
+
+      function handle3DSearch() {
+        const query = (document.getElementById('space-search-input').value || '').trim();
+        if (!query) return;
+        const match = EMBEDDING_DATASET.find(d => d.word.toLowerCase().includes(query.toLowerCase()));
+        if (match) {
+          focusWordIn3DSpace(match.word, false);
+        } else {
+          document.getElementById('space-xyz-readout').textContent =
+            `"${query}" not in 36-word 3D space. Try King, Queen, Apple, Dog, AI, Car...`;
+        }
+      }
+
+      document.getElementById('space-search-btn').addEventListener('click', handle3DSearch);
+      document.getElementById('space-search-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') handle3DSearch();
+      });
+
+      document.querySelectorAll('.space-quick-word').forEach(btn => {
+        btn.addEventListener('click', () => {
+          focusWordIn3DSpace(btn.getAttribute('data-word'), false);
+        });
+      });
+
+      /* ---------------------------------------------------------
+         9. SECTION 7: CLOSEST PAIRS & COSINE ANGLE VISUALIZER
+      --------------------------------------------------------- */
+      // Precompute all unique pairs from EMBEDDING_DATASET
+      const ALL_WORD_PAIRS = [];
+      for (let i = 0; i < EMBEDDING_DATASET.length; i++) {
+        for (let j = i + 1; j < EMBEDDING_DATASET.length; j++) {
+          const a = EMBEDDING_DATASET[i];
+          const b = EMBEDDING_DATASET[j];
+          const sim = cosineSimilarity(a.vec8, b.vec8);
+          ALL_WORD_PAIRS.push({
+            word1: a.word,
+            word2: b.word,
+            cat1: a.category,
+            cat2: b.category,
+            similarity: sim
+          });
+        }
+      }
+      ALL_WORD_PAIRS.sort((a, b) => b.similarity - a.similarity);
+
+      function renderClosestPairsTable() {
+        const searchVal = (document.getElementById('pairs-search-input').value || '').trim().toLowerCase();
+        const sortMode = document.getElementById('pairs-sort-select').value;
+
+        let list = ALL_WORD_PAIRS.filter(p => {
+          if (!searchVal) return true;
+          return p.word1.toLowerCase().includes(searchVal) || p.word2.toLowerCase().includes(searchVal);
+        });
+
+        if (sortMode === 'top10') {
+          list = [...list].sort((a, b) => b.similarity - a.similarity).slice(0, 10);
+        } else if (sortMode === 'desc') {
+          list = [...list].sort((a, b) => b.similarity - a.similarity).slice(0, 35);
+        } else if (sortMode === 'asc') {
+          list = [...list].sort((a, b) => a.similarity - b.similarity).slice(0, 35);
+        }
+
+        const tbody = document.getElementById('closest-pairs-tbody');
+        tbody.innerHTML = '';
+
+        list.forEach(pair => {
+          const tr = document.createElement('tr');
+          const pct = Math.max(0, Math.round(pair.similarity * 100));
+          tr.innerHTML = `
+            <td style="font-weight:600;color:#fff;">${pair.word1}</td>
+            <td style="font-weight:600;color:#fff;">${pair.word2}</td>
+            <td>
+              <div class="sim-bar-wrap">
+                <div class="sim-bar-bg"><div class="sim-bar-fill" style="width:${pct}%;"></div></div>
+                <span class="font-mono" style="color:var(--cyan-bright);font-weight:600;">${pair.similarity.toFixed(4)}</span>
+              </div>
+            </td>
+            <td><button class="btn-chip" type="button" data-pair-w1="${pair.word1}" data-pair-w2="${pair.word2}">View in 3D</button></td>
+          `;
+          tr.addEventListener('click', () => {
+            document.getElementById('angle-word-a').value = pair.word1;
+            document.getElementById('angle-word-b').value = pair.word2;
+            renderAngleVisualizer();
+          });
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll('[data-pair-w1]').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            const w1 = btn.getAttribute('data-pair-w1');
+            const w2 = btn.getAttribute('data-pair-w2');
+            highlightMultipleWordsIn3DSpace([w1, w2], true);
+          });
+        });
+      }
+
+      function populatePairSelectors() {
+        const selA = document.getElementById('angle-word-a');
+        const selB = document.getElementById('angle-word-b');
+        const selNeighbor = document.getElementById('neighbor-finder-select');
+
+        const optionsHtml = EMBEDDING_DATASET.map(d => `<option value="${d.word}">${d.word} (${d.category})</option>`).join('');
+        selA.innerHTML = optionsHtml;
+        selB.innerHTML = optionsHtml;
+        selNeighbor.innerHTML = optionsHtml;
+
+        selA.value = 'King';
+        selB.value = 'Queen';
+        selNeighbor.value = 'King';
+      }
+
+      function renderAngleVisualizer() {
+        const wordA = document.getElementById('angle-word-a').value || 'King';
+        const wordB = document.getElementById('angle-word-b').value || 'Queen';
+        const itemA = EMBEDDING_BY_LOWER.get(wordA.toLowerCase()) || EMBEDDING_DATASET[0];
+        const itemB = EMBEDDING_BY_LOWER.get(wordB.toLowerCase()) || EMBEDDING_DATASET[1];
+
+        const dot = dotProduct(itemA.vec8, itemB.vec8);
+        const magA = magnitude(itemA.vec8);
+        const magB = magnitude(itemB.vec8);
+        const sim = cosineSimilarity(itemA.vec8, itemB.vec8);
+        const angleRad = Math.acos(Math.max(-1, Math.min(1, sim)));
+        const angleDeg = (angleRad * 180) / Math.PI;
+
+        const canvas = document.getElementById('cosine-angle-canvas');
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const ox = 85;
+        const oy = h - 38;
+        const len = 135;
+
+        // Reference grid arc
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(ox, oy, len, -Math.PI / 2, 0.2);
+        ctx.stroke();
+
+        // Vector A at 15 degrees above horizontal
+        const baseAngle = -0.22;
+        const vecBAngle = baseAngle - angleRad * 0.75;
+
+        const ax = ox + Math.cos(baseAngle) * len;
+        const ay = oy + Math.sin(baseAngle) * len;
+        const bx = ox + Math.cos(vecBAngle) * len;
+        const by = oy + Math.sin(vecBAngle) * len;
+
+        // Angle arc between A and B
+        ctx.fillStyle = 'rgba(6, 182, 212, 0.16)';
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.arc(ox, oy, 48, vecBAngle, baseAngle);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw Vector A
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(ax, ay);
+        ctx.stroke();
+        ctx.fillStyle = '#ddd6fe';
+        ctx.font = 'bold 12px Space Grotesk, sans-serif';
+        ctx.fillText(`A: ${itemA.word}`, ax + 8, ay + 4);
+
+        // Draw Vector B
+        ctx.strokeStyle = '#22d3ee';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(bx, by);
+        ctx.stroke();
+        ctx.fillStyle = '#a5f3fc';
+        ctx.fillText(`B: ${itemB.word}`, bx + 8, by);
+
+        // Angle label
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '600 12px JetBrains Mono, monospace';
+        ctx.fillText(`θ = ${angleDeg.toFixed(1)}°  |  cos(θ) = ${sim.toFixed(4)}`, ox + 110, 32);
+
+        document.getElementById('cosine-math-readout').innerHTML = `
+          A·B = <strong>${dot.toFixed(3)}</strong> &nbsp;|&nbsp;
+          ||A|| = <strong>${magA.toFixed(3)}</strong> &nbsp;|&nbsp;
+          ||B|| = <strong>${magB.toFixed(3)}</strong> &nbsp;→&nbsp;
+          Similarity = <strong style="color:var(--cyan-bright);">${sim.toFixed(4)}</strong>
+        `;
+      }
+
+      function renderNeighborFinder() {
+        const word = document.getElementById('neighbor-finder-select').value || 'King';
+        const neighbors = getTopNeighborsForWord(word, 5);
+        const container = document.getElementById('neighbor-finder-results');
+
+        container.innerHTML = neighbors.map((n, idx) => {
+          const pct = Math.max(0, Math.round(n.similarity * 100));
+          const col = CATEGORY_COLORS[n.category] || '#a855f7';
+          return `
+            <div style="background:rgba(5,8,16,0.8);border:1px solid var(--border-subtle);border-radius:10px;padding:12px 14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-weight:600;color:#fff;">#${idx + 1} &nbsp;<span style="color:${col};">●</span> ${n.word} <span style="font-size:0.75rem;color:var(--text-muted);">(${n.category})</span></span>
+                <span class="font-mono" style="color:var(--cyan-bright);font-weight:600;">${n.similarity.toFixed(4)}</span>
+              </div>
+              <div class="sim-bar-bg"><div class="sim-bar-fill" style="width:${pct}%;"></div></div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('pairs-search-input').addEventListener('input', renderClosestPairsTable);
+      document.getElementById('pairs-sort-select').addEventListener('change', renderClosestPairsTable);
+      document.getElementById('angle-word-a').addEventListener('change', renderAngleVisualizer);
+      document.getElementById('angle-word-b').addEventListener('change', renderAngleVisualizer);
+      document.getElementById('neighbor-finder-select').addEventListener('change', renderNeighborFinder);
+      document.getElementById('neighbor-show-3d-btn').addEventListener('click', () => {
+        const w = document.getElementById('neighbor-finder-select').value || 'King';
+        focusWordIn3DSpace(w, true);
+      });
+
+      /* ---------------------------------------------------------
+         10. SECTION 8: TRY YOUR OWN WORD OR SENTENCE LAB
+      --------------------------------------------------------- */
+      let lastExperimentRecognizedWords = ['King', 'Palace'];
+
+      function runExperimentPipeline() {
+        const inputEl = document.getElementById('experiment-input');
+        const rawText = (inputEl.value || '').trim();
+
+        if (!rawText) {
+          document.getElementById('exp-step1-body').innerHTML = '<span style="color:var(--amber);">Please enter a word or sentence above and click Analyze.</span>';
+          document.getElementById('exp-step2-body').innerHTML = '';
+          document.getElementById('exp-step3-body').innerHTML = '';
+          document.getElementById('exp-step4-body').innerHTML = '';
+          document.getElementById('exp-step5-body').innerHTML = '';
+          document.getElementById('exp-step6-body').innerHTML = '';
+          document.getElementById('exp-stat-tokens').textContent = '0';
+          document.getElementById('exp-stat-vocab').textContent = '0 / 0';
+          document.getElementById('exp-stat-emb').textContent = '0 Words';
+          document.getElementById('exp-stat-unk').textContent = '0 Tokens';
+          return;
+        }
+
+        // Tokenize input using word-level tokenizer
+        const tokens = tokenizeEducational(rawText, 'word');
+
+        // Identify which tokens exist in the 36-word embedding dataset
+        const recognizedEmbeddings = [];
+        const unsupportedTokens = [];
+
+        tokens.forEach(tok => {
+          const embItem = EMBEDDING_BY_LOWER.get(tok.text.toLowerCase());
+          if (embItem) {
+            if (!recognizedEmbeddings.some(e => e.word === embItem.word)) {
+              recognizedEmbeddings.push(embItem);
+            }
+          } else {
+            unsupportedTokens.push(tok);
+          }
+        });
+
+        lastExperimentRecognizedWords = recognizedEmbeddings.map(e => e.word);
+
+        // Update top stats
+        document.getElementById('exp-stat-tokens').textContent = String(tokens.length);
+        document.getElementById('exp-stat-vocab').textContent = `${tokens.length} / ${tokens.length}`;
+        document.getElementById('exp-stat-emb').textContent = `${recognizedEmbeddings.length} Word${recognizedEmbeddings.length === 1 ? '' : 's'}`;
+        document.getElementById('exp-stat-unk').textContent = `${unsupportedTokens.length} Token${unsupportedTokens.length === 1 ? '' : 's'}`;
+
+        // STEP 1: INPUT TEXT
+        document.getElementById('exp-step1-meta').textContent = `${rawText.length} characters • ${tokens.length} tokens`;
+        document.getElementById('exp-step1-body').textContent = `"${rawText}"`;
+
+        // STEP 2: TOKENIZATION
+        const step2El = document.getElementById('exp-step2-body');
+        step2El.innerHTML = tokens.map((tok, i) => `
+          <div class="token-pill ${tok.typeClass}">
+            <span class="tok-str">${escapeHtml(tok.text)}</span>
+            <span class="tok-meta">Token #${i + 1} (${tok.typeLabel})</span>
+          </div>
+        `).join('');
+
+        // STEP 3: VOCABULARY LOOKUP
+        const step3El = document.getElementById('exp-step3-body');
+        step3El.innerHTML = tokens.map(tok => {
+          const hasEmb = EMBEDDING_BY_LOWER.has(tok.text.toLowerCase());
+          return `
+            <div style="background:rgba(5,8,16,0.85);border:1px solid ${hasEmb ? 'var(--border-cyan)' : 'var(--border-subtle)'};border-radius:8px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:0.82rem;">
+              <span style="color:#fff;">"${escapeHtml(tok.text)}"</span>
+              <span style="color:var(--cyan-bright);"> → ID #${tok.id}</span>
+            </div>
+          `;
+        }).join('');
+
+        // STEP 4: EMBEDDINGS
+        const step4El = document.getElementById('exp-step4-body');
+        let step4Html = '';
+        if (recognizedEmbeddings.length > 0) {
+          step4Html += `<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">` +
+            recognizedEmbeddings.map(emb => `
+              <div style="background:rgba(5,8,16,0.85);border:1px solid var(--border-purple);border-radius:10px;padding:12px 14px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+                  <strong style="color:#fff;font-size:0.95rem;">${emb.word} <span class="font-mono" style="color:var(--purple-bright);font-size:0.8rem;">(Token ID #${emb.id} • ${emb.category})</span></strong>
+                  <span class="font-mono" style="font-size:0.78rem;color:var(--cyan-bright);">3D XYZ: [${emb.xyz.map(v => v.toFixed(2)).join(', ')}]</span>
+                </div>
+                <div class="font-mono" style="font-size:0.78rem;color:var(--text-secondary);word-break:break-all;">
+                  8D Vector: [${emb.vec8.map(v => v.toFixed(2)).join(', ')}]
+                </div>
+              </div>
+            `).join('') + `</div>`;
+        }
+        if (unsupportedTokens.length > 0) {
+          const unkList = unsupportedTokens.map(t => `"${escapeHtml(t.text)}"`).join(', ');
+          step4Html += `
+            <div style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.35);border-radius:8px;padding:10px 14px;font-size:0.83rem;color:var(--text-secondary);">
+              <strong style="color:var(--amber);">Unavailable in 36-Word Demonstration Embedding Dataset:</strong> ${unkList}.<br/>
+              These tokens were tokenized and assigned Vocabulary IDs in Step 3, but because our educational embedding space contains 36 curated semantic words, pre-computed embedding vectors are not stored for them (we never invent random fake similarities).
+            </div>
+          `;
+        }
+        step4El.innerHTML = step4Html;
+
+        // STEP 5: SIMILARITY
+        const step5El = document.getElementById('exp-step5-body');
+        if (recognizedEmbeddings.length === 0) {
+          step5El.innerHTML = `
+            <div style="font-size:0.86rem;color:var(--text-muted);">
+              No words from the 36-word embedding dataset were found in this input. Try including words like <code>King</code>, <code>Queen</code>, <code>Palace</code>, <code>Dog</code>, <code>Cat</code>, <code>Apple</code>, <code>Orange</code>, <code>Car</code>, <code>Computer</code>, <code>Laptop</code>, or <code>AI</code>!
+            </div>
+          `;
+        } else {
+          step5El.innerHTML = `<div class="grid-2">` + recognizedEmbeddings.map(emb => {
+            const top3 = getTopNeighborsForWord(emb.word, 3);
+            return `
+              <div style="background:rgba(5,8,16,0.82);border:1px solid var(--border-subtle);border-radius:10px;padding:12px 14px;">
+                <div style="font-size:0.84rem;font-weight:600;color:#fff;margin-bottom:8px;">
+                  Closest matches for <span style="color:var(--cyan-bright);">${emb.word}</span>:
+                </div>
+                ${top3.map(n => {
+                  const pct = Math.max(0, Math.round(n.similarity * 100));
+                  return `
+                    <div style="display:grid;grid-template-columns:85px 1fr 50px;align-items:center;gap:8px;font-size:0.8rem;margin-bottom:6px;">
+                      <span style="color:var(--text-secondary);">${n.word}</span>
+                      <div class="sim-bar-bg"><div class="sim-bar-fill" style="width:${pct}%;"></div></div>
+                      <span class="font-mono" style="color:var(--cyan-bright);text-align:right;">${n.similarity.toFixed(3)}</span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `;
+          }).join('') + `</div>`;
+        }
+
+        // STEP 6: VISUALIZATION SUMMARY
+        const step6El = document.getElementById('exp-step6-body');
+        if (recognizedEmbeddings.length > 0) {
+          const names = recognizedEmbeddings.map(e => e.word).join(', ');
+          step6El.innerHTML = `
+            <p style="font-size:0.88rem;color:var(--text-secondary);">
+              ✓ Highlighted <strong style="color:var(--cyan-bright);">${names}</strong> inside the 3D Embedding Space above! Click <strong>"Highlight in 3D Embedding Space ↑"</strong> to jump to the 3D viewport and inspect their spatial cluster and connecting vectors.
+            </p>
+          `;
+          highlightMultipleWordsIn3DSpace(lastExperimentRecognizedWords, false);
+        } else {
+          step6El.innerHTML = `
+            <p style="font-size:0.88rem;color:var(--text-muted);">
+              Tokenization and Vocabulary ID mapping completed for all ${tokens.length} token(s). Include at least one word from the 36-word embedding dataset to highlight its vector coordinates in the 3D space.
+            </p>
+          `;
+        }
+
+        renderVocabularyTable();
+      }
+
+      document.getElementById('experiment-analyze-btn').addEventListener('click', runExperimentPipeline);
+      document.getElementById('experiment-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') runExperimentPipeline();
+      });
+
+      document.getElementById('experiment-clear-btn').addEventListener('click', () => {
+        document.getElementById('experiment-input').value = '';
+        runExperimentPipeline();
+      });
+
+      document.querySelectorAll('.exp-sample').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.getElementById('experiment-input').value = btn.getAttribute('data-text');
+          runExperimentPipeline();
+        });
+      });
+
+      document.getElementById('exp-highlight-3d-btn').addEventListener('click', () => {
+        if (lastExperimentRecognizedWords.length > 0) {
+          highlightMultipleWordsIn3DSpace(lastExperimentRecognizedWords, true);
+        } else {
+          document.getElementById('space-3d').scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+
+      /* ---------------------------------------------------------
+         11. NAVIGATION, SCROLL SPY & LEARNING PROGRESS TRACKER
+      --------------------------------------------------------- */
+      const visitedSections = new Set(['home']);
+      const SECTION_IDS = ['home', 'tokenization', 'vocabulary', 'embeddings', 'space-3d', 'closest-pairs', 'experiment'];
+
+      function updateLearningProgress(activeId) {
+        if (activeId) visitedSections.add(activeId);
+        const count = visitedSections.size;
+        const pct = Math.round((count / SECTION_IDS.length) * 100);
+        document.getElementById('journey-pct').textContent = `${pct}%`;
+        document.getElementById('journey-bar').style.width = `${pct}%`;
+        document.getElementById('journey-count').textContent = `${count} of ${SECTION_IDS.length} modules explored`;
+
+        document.querySelectorAll('#nav-list .nav-link').forEach(link => {
+          const sec = link.getAttribute('data-section');
+          link.classList.toggle('active', sec === activeId);
+          if (visitedSections.has(sec)) {
+            link.classList.add('visited');
+          }
+        });
+      }
+
+      // IntersectionObserver for active section highlight
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            updateLearningProgress(entry.target.id);
+          }
+        });
+      }, { rootMargin: '-25% 0px -55% 0px', threshold: 0.05 });
+
+      SECTION_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      });
+
+      // Mobile Sidebar Drawer Toggle
+      const sidebarEl = document.getElementById('sidebar');
+      const backdropEl = document.getElementById('sidebar-backdrop');
+      document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+        sidebarEl.classList.toggle('open');
+        backdropEl.classList.toggle('open');
+      });
+      backdropEl.addEventListener('click', () => {
+        sidebarEl.classList.remove('open');
+        backdropEl.classList.remove('open');
+      });
+      document.querySelectorAll('#nav-list .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          sidebarEl.classList.remove('open');
+          backdropEl.classList.remove('open');
+        });
+      });
+
+      /* ---------------------------------------------------------
+         12. 3D SPATIAL THEME SWITCHER, 3D CARD TILT & AMBIENT 3D BG
+      --------------------------------------------------------- */
+      let autoOrbit3D = true;
+      let enable3DTilt = true;
+
+      const orbitBtn = document.getElementById('space-toggle-orbit');
+      if (orbitBtn) {
+        orbitBtn.addEventListener('click', function () {
+          autoOrbit3D = !autoOrbit3D;
+          this.textContent = `3D Orbit: ${autoOrbit3D ? 'ON' : 'OFF'}`;
+          if (autoOrbit3D) request3DRender();
+        });
+      }
+
+      setInterval(() => {
+        if (autoOrbit3D && !isDragging3D) {
+          targetTheta += 0.008;
+          request3DRender();
+        }
+      }, 45);
+
+      // 3D Theme Switcher Buttons
+      document.querySelectorAll('#theme-3d-grid .theme-3d-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#theme-3d-grid .theme-3d-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const themeVal = btn.getAttribute('data-theme-val');
+          if (themeVal === 'emerald') {
+            document.documentElement.removeAttribute('data-theme');
+          } else {
+            document.documentElement.setAttribute('data-theme', themeVal);
+          }
+          request3DRender();
+          drawAmbient3DBackground();
+        });
+      });
+
+      // Toggle 3D Card Tilt Physics
+      const tiltBtn = document.getElementById('toggle-3d-tilt-btn');
+      if (tiltBtn) {
+        tiltBtn.addEventListener('click', () => {
+          enable3DTilt = !enable3DTilt;
+          tiltBtn.textContent = `3D Tilt: ${enable3DTilt ? 'ON' : 'OFF'}`;
+          if (!enable3DTilt) {
+            document.querySelectorAll('.glass-card').forEach(card => {
+              card.style.setProperty('--rx', '0deg');
+              card.style.setProperty('--ry', '0deg');
+            });
+          }
+        });
+      }
+
+      function init3DCardTiltPhysics() {
+        document.querySelectorAll('.glass-card').forEach(card => {
+          card.addEventListener('mousemove', e => {
+            if (!enable3DTilt) return;
+            // Disable tilt when hovering over the interactive 3D canvas wrapper
+            if (e.target && e.target.closest && e.target.closest('#canvas-3d-wrapper')) return;
+            const rect = card.getBoundingClientRect();
+            const px = (e.clientX - rect.left) / Math.max(1, rect.width);
+            const py = (e.clientY - rect.top) / Math.max(1, rect.height);
+            const rx = (0.5 - py) * 4.2;
+            const ry = (px - 0.5) * 4.2;
+            card.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
+            card.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
+            card.style.setProperty('--glare-x', `${(px * 100).toFixed(1)}%`);
+            card.style.setProperty('--glare-y', `${(py * 100).toFixed(1)}%`);
+          });
+          card.addEventListener('mouseleave', () => {
+            card.style.setProperty('--rx', '0deg');
+            card.style.setProperty('--ry', '0deg');
+          });
+        });
+      }
+
+      // Ambient 3D Background Neural Lattice
+      const ambientCanvas = document.getElementById('ambient-3d-bg');
+      const ambientNodes = [];
+      for (let i = 0; i < 28; i++) {
+        // Deterministic 3D coordinates for background floating lattice
+        const seed = (i + 1) * 1.6180339;
+        ambientNodes.push({
+          x: Math.sin(seed * 3.1) * 1.5,
+          y: Math.cos(seed * 2.3) * 1.2,
+          z: (Math.sin(seed * 5.7) * 0.8) + 1.8,
+          r: 2 + (i % 3)
+        });
+      }
+      let bgParallaxX = 0;
+      let bgParallaxY = 0;
+
+      function drawAmbient3DBackground() {
+        if (!ambientCanvas || !ambientCanvas.getContext) return;
+        const ctx = ambientCanvas.getContext('2d');
+        const w = ambientCanvas.width = window.innerWidth || 1200;
+        const h = ambientCanvas.height = window.innerHeight || 800;
+        ctx.clearRect(0, 0, w, h);
+
+        const theme = document.documentElement.getAttribute('data-theme') || 'emerald';
+        const nodeColor = theme === 'solaris'
+          ? 'rgba(255, 42, 133, 0.35)'
+          : (theme === 'quantum' ? 'rgba(129, 140, 248, 0.35)' : 'rgba(0, 245, 212, 0.32)');
+        const lineColor = theme === 'solaris'
+          ? 'rgba(56, 189, 248, 0.08)'
+          : (theme === 'quantum' ? 'rgba(34, 211, 238, 0.08)' : 'rgba(251, 191, 36, 0.08)');
+
+        const pts = ambientNodes.map(n => {
+          const zDist = Math.max(0.6, n.z);
+          const scale = (Math.min(w, h) * 0.65) / zDist;
+          return {
+            sx: w / 2 + (n.x + bgParallaxX * 0.15) * scale,
+            sy: h / 2 + (n.y + bgParallaxY * 0.15) * scale,
+            r: n.r * (1.8 / zDist)
+          };
+        });
+
+        ctx.strokeStyle = lineColor;
+        ctx.lineWidth = 1;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            const d = Math.hypot(pts[i].sx - pts[j].sx, pts[i].sy - pts[j].sy);
+            if (d < 220) {
+              ctx.beginPath();
+              ctx.moveTo(pts[i].sx, pts[i].sy);
+              ctx.lineTo(pts[j].sx, pts[j].sy);
+              ctx.stroke();
+            }
+          }
+        }
+
+        pts.forEach(p => {
+          ctx.fillStyle = nodeColor;
+          ctx.beginPath();
+          ctx.arc(p.sx, p.sy, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      window.addEventListener('mousemove', e => {
+        const w = window.innerWidth || 1200;
+        const h = window.innerHeight || 800;
+        bgParallaxX = (e.clientX / w - 0.5);
+        bgParallaxY = (e.clientY / h - 0.5);
+        drawAmbient3DBackground();
+      });
+
+      /* ---------------------------------------------------------
+         13. INITIALIZATION ON LOAD & RESIZE
+      --------------------------------------------------------- */
+      function initApp() {
+        updateVocabCounters();
+        renderVocabVisualMapping('I love AI');
+        renderTokenizationPlayground();
+        renderVocabularyTable();
+        renderEmbeddingWordSelector();
+        renderEmbeddingDetails();
+        renderCategoryLegend();
+        update3DSidePanel('King');
+        populatePairSelectors();
+        renderClosestPairsTable();
+        renderAngleVisualizer();
+        renderNeighborFinder();
+        runExperimentPipeline();
+        resize3DCanvas();
+        init3DCardTiltPhysics();
+        drawAmbient3DBackground();
+
+        window.addEventListener('resize', () => {
+          resize3DCanvas();
+          drawAmbient3DBackground();
+          if (currentEmbeddingView === '2d') {
+            const item = EMBEDDING_BY_LOWER.get(selectedEmbeddingWord.toLowerCase()) || EMBEDDING_DATASET[0];
+            draw2DProjectionCanvas(item);
+          }
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+      } else {
+        initApp();
+      }
+    })();
+  </script>
+</body>
+</html>
